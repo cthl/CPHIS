@@ -1,0 +1,5 @@
+//! @mainpage CPHIS - Composable p-hierarchical solver
+//! For an introduction to CPHIS, please see
+//! <a href="../../README.md">here</a>.
+//! For the documentation of the public CHPIS API, please see
+//! @link cphis.h here @endlink.
