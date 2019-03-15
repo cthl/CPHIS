@@ -1,7 +1,7 @@
 # CHPIS
-## Composable $p$-hierarchical solver
+## Composable p-hierarchical solver
 
-CPHIS is a composable implementation of $p$-hierarchical methods for the
+CPHIS is a composable implementation of p-hierarchical methods for the
 solution of linear systems in discontinuous Galerkin discretizations with
 hierarchical basis functions.
 It is composable in the sense that CPHIS can not only be used within other
