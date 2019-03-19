@@ -15,6 +15,8 @@ struct _CphisScaleSolver
   CphisReal tol;
   // Maximum number of iterations
   int maxIter;
+  // Relaxation parameter
+  CphisReal omega;
   // Additional data for specific solvers
   void *data;
 };

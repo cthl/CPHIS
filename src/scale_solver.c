@@ -17,6 +17,7 @@ CphisError CphisScaleSolverCreate(
   (*solver)->type = type;
   (*solver)->tol = 1.0e-6;
   (*solver)->maxIter = 1e6;
+  (*solver)->omega = 1.0;
   (*solver)->A = NULL;
   (*solver)->data = NULL;
 
@@ -62,6 +63,12 @@ CphisError CphisScaleSolverSetMaxIter(CphisScaleSolver solver, int maxIter)
 CphisError CphisScaleSolverSetTol(CphisScaleSolver solver, CphisReal tol)
 {
   solver->tol = tol;
+  return CPHIS_SUCCESS;
+}
+
+CphisError CphisScaleSolverSetOmega(CphisScaleSolver solver, CphisReal omega)
+{
+  solver->omega = omega;
   return CPHIS_SUCCESS;
 }
 

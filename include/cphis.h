@@ -256,6 +256,10 @@ CphisError CphisScaleSolverSetMaxIter(CphisScaleSolver solver, int maxIter);
 //! @note This may be set to `0.0` if no convergence test is desired, e.g.,
 //!       for smoothers.
 CphisError CphisScaleSolverSetTol(CphisScaleSolver solver, CphisReal tol);
+//! @brief Set the relaxation parameter \f$\omega\f$.
+//! This can be used for over-relaxation and under-relaxation.
+//! The parameter will be ignored by solvers that cannot use it.
+CphisError CphisScaleSolverSetOmega(CphisScaleSolver solver, CphisReal omega);
 //! @brief Set the matrix and prepare the solver, preconditioner, etc.
 //! @warning This function must not be called twice for the same solver!
 //!          If a new matrix is to be used, please create a new solver.

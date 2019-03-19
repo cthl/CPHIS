@@ -491,7 +491,7 @@ static CphisError CphisSolverSolveCoarseScale(
 
   if (solver->conf->verbosity >= CPHIS_VERBOSITY_DETAILED) {
     CphisPrintf(
-      "#0: Finished coarse scale solve (residual = %e, %d iter.)\n",
+      "#0: Finished coarse scale solve\n    (residual = %e, %d iter.)\n",
       residual,
       iter
     );
@@ -1011,35 +1011,35 @@ static CphisError CphisSolverPrintTimers(const CphisSolver solver)
   CphisPrintf("CPHIS Timers:\n");
   #ifdef _OPENMP
   CphisPrintf(
-    "       Setup:                              %.3f\n",
+    "       Setup:                              %.3f s\n",
     solver->timers[CPHIS_TIMER_SETUP]
   );
   CphisPrintf(
-    "       Solve:                              %.3f\n",
+    "       Solve:                              %.3f s\n",
     solver->timers[CPHIS_TIMER_SOLVER]
   );
   CphisPrintf(
-    "       Presmooth:                          %.3f\n",
+    "       Presmooth:                          %.3f s\n",
     solver->timers[CPHIS_TIMER_PRESMOOTH]
   );
   CphisPrintf(
-    "       Postsmooth:                         %.3f\n",
+    "       Postsmooth:                         %.3f s\n",
     solver->timers[CPHIS_TIMER_POSTSMOOTH]
   );
   CphisPrintf(
-    "       Coarse scale solves:                %.3f\n",
+    "       Coarse scale solves:                %.3f s\n",
     solver->timers[CPHIS_TIMER_COARSE_SOLVE]
   );
   CphisPrintf(
-    "       Multigrid residual & restriction:   %.3f\n",
+    "       Multigrid residual & restriction:   %.3f s\n",
     solver->timers[CPHIS_TIMER_RESIDUAL]
   );
   CphisPrintf(
-    "       Prolongation:                       %.3f\n",
+    "       Prolongation:                       %.3f s\n",
     solver->timers[CPHIS_TIMER_PROLONGATION]
   );
   CphisPrintf(
-    "       System residual check:              %.3f\n",
+    "       System residual check:              %.3f s\n",
     solver->timers[CPHIS_TIMER_SYSTEM_RESIDUAL]
   );
 
@@ -1052,7 +1052,10 @@ static CphisError CphisSolverPrintTimers(const CphisSolver solver)
     tDelta += solver->timers[i];
   }
   tDelta = solver->timers[CPHIS_TIMER_SOLVER] - tDelta;
-  CphisPrintf("       Time delta:                         %.3f\n", tDelta);
+  CphisPrintf("       Time delta:                         %.3f s\n", tDelta);
+
+  const double wtick = omp_get_wtick();
+  CphisPrintf("       Timer resolution:                   %.3e s\n", wtick);
   #else
   CphisPrintf("       Timers require OpenMP to be enabled!\n");
   #endif
@@ -1149,14 +1152,17 @@ CphisError CphisSolverSolve(
   if (solver->conf->verbosity >= CPHIS_VERBOSITY_SUMMARY) {
     if (rNorm/r0Norm < solver->conf->tol) {
       CphisPrintf(
-        "CPHIS: Solver converged to desired tolerance of %e!\n",
+        "CPHIS: Solver converged to desired tolerance of %.3e!\n",
         solver->conf->tol
       );
     }
     if (k >= solver->conf->maxIter) {
       CphisPrintf("CPHIS: Solver reached the maximum number of iterations!\n");
     }
-    CphisPrintf("       Rel. residual:                      %e\n", rNorm/r0Norm);
+    CphisPrintf(
+      "       Rel. residual:                      %e\n",
+      rNorm/r0Norm
+    );
     CphisPrintf("       #Iterations:                        %d\n", k);
     CphisPrintf(
       "       #Iterations (coarse scale solver):  %d\n",

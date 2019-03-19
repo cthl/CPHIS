@@ -217,9 +217,10 @@ CphisError CphisScaleSolverSolve_Jacobi(
     }
 
     // Perform Jacobi iteration.
+    const CphisReal omega = solver->omega;
     #pragma omp parallel for
     for (CphisIndex i = 0; i < numRows; i++) {
-      xData[i] += data->invD[i]*rData[i];
+      xData[i] += omega*data->invD[i]*rData[i];
     }
 
     // Update residual and residual norm.
@@ -278,6 +279,7 @@ CphisError CphisScaleSolverSolve_BlockJacobi(
     }
 
     // Perform Jacobi iteration.
+    const CphisReal omega = solver->omega;
     #pragma omp parallel for
     for (CphisIndex i = 0; i < x->numElements; i++) {
       CphisLUSolve(
@@ -287,7 +289,7 @@ CphisError CphisScaleSolverSolve_BlockJacobi(
         &zData[i*numLocalDOF]
       );
       for (int j = 0; j < numLocalDOF; j++) {
-        xData[i*numLocalDOF + j] += zData[i*numLocalDOF + j];
+        xData[i*numLocalDOF + j] += omega*zData[i*numLocalDOF + j];
       }
     }
 
