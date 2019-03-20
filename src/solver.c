@@ -1080,10 +1080,13 @@ CphisError CphisSolverSolve(
   const double tStart = omp_get_wtime();
   #endif
 
-  // Compute initial residual norm.
-  err = CphisMatVec(solver->A, x, solver->rfull);CPHISCHECK(err);
-  err = CphisVecAXPY(-1.0, b, solver->rfull);CPHISCHECK(err);
-  err = CphisVecNorm2(solver->rfull, &r0Norm);CPHISCHECK(err);
+  // Compute initial residual norm (only if used as a stopping criterion).
+  const int computeResidual = solver->conf->tol > 0.0;
+  if (computeResidual) {
+    err = CphisMatVec(solver->A, x, solver->rfull);CPHISCHECK(err);
+    err = CphisVecAXPY(-1.0, b, solver->rfull);CPHISCHECK(err);
+    err = CphisVecNorm2(solver->rfull, &r0Norm);CPHISCHECK(err);
+  }
   rNorm = r0Norm;
 
   #ifdef _OPENMP
@@ -1098,7 +1101,7 @@ CphisError CphisSolverSolve(
 
   while (1) {
     // Check residual norm.
-    if (rNorm/r0Norm < solver->conf->tol) {
+    if (solver->conf->tol > 0.0 && rNorm/r0Norm < solver->conf->tol) {
       if (flag) *flag = CPHIS_CONVERGED;
       break;
     }
@@ -1117,13 +1120,15 @@ CphisError CphisSolverSolve(
     // Perform one full cycle.
     err = CphisSolverCycle(solver, b, x);CPHISCHECK(err);
 
-    // Compute residual norm.
+    // Compute residual norm (only if used as a stopping criterion.
     #ifdef _OPENMP
     const double tStartResidual = omp_get_wtime();
     #endif
-    err = CphisMatVec(solver->A, x, solver->rfull);CPHISCHECK(err);
-    err = CphisVecAXPY(-1.0, b, solver->rfull);CPHISCHECK(err);
-    err = CphisVecNorm2(solver->rfull, &rNorm);CPHISCHECK(err);
+    if (computeResidual) {
+      err = CphisMatVec(solver->A, x, solver->rfull);CPHISCHECK(err);
+      err = CphisVecAXPY(-1.0, b, solver->rfull);CPHISCHECK(err);
+      err = CphisVecNorm2(solver->rfull, &rNorm);CPHISCHECK(err);
+    }
     #ifdef _OPENMP
     const double tEndResidual = omp_get_wtime();
     solver->timers[CPHIS_TIMER_SYSTEM_RESIDUAL]
@@ -1131,11 +1136,16 @@ CphisError CphisSolverSolve(
     #endif
 
     if (solver->conf->verbosity >= CPHIS_VERBOSITY_DETAILED) {
-      CphisPrintf(
-        "End of iteration #%d (residual = %e)\n",
-        k + 1,
-        rNorm/r0Norm
-      );
+      if (computeResidual) {
+        CphisPrintf(
+          "End of iteration #%d (residual = %e)\n",
+          k + 1,
+          rNorm/r0Norm
+        );
+      }
+      else {
+        CphisPrintf("End of iteration #%d (residual not computed)\n", k + 1);
+      }
     }
 
     k++;
@@ -1150,7 +1160,7 @@ CphisError CphisSolverSolve(
       CphisPrintHline(1);
   }
   if (solver->conf->verbosity >= CPHIS_VERBOSITY_SUMMARY) {
-    if (rNorm/r0Norm < solver->conf->tol) {
+    if (computeResidual && rNorm/r0Norm < solver->conf->tol) {
       CphisPrintf(
         "CPHIS: Solver converged to desired tolerance of %.3e!\n",
         solver->conf->tol
@@ -1159,10 +1169,15 @@ CphisError CphisSolverSolve(
     if (k >= solver->conf->maxIter) {
       CphisPrintf("CPHIS: Solver reached the maximum number of iterations!\n");
     }
-    CphisPrintf(
-      "       Rel. residual:                      %e\n",
-      rNorm/r0Norm
-    );
+    if (computeResidual) {
+      CphisPrintf(
+        "       Rel. residual:                      %e\n",
+        rNorm/r0Norm
+      );
+    }
+    else {
+      CphisPrintf("       Rel. residual:                      not computed\n");
+    }
     CphisPrintf("       #Iterations:                        %d\n", k);
     CphisPrintf(
       "       #Iterations (coarse scale solver):  %d\n",
@@ -1181,7 +1196,7 @@ CphisError CphisSolverSolve(
       CphisPrintHline(1);
   }
 
-  if (residual) *residual = rNorm/r0Norm;
+  if (computeResidual && residual) *residual = rNorm/r0Norm;
   if (iter) *iter = k;
 
   return CPHIS_SUCCESS;
