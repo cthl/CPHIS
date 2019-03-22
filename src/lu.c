@@ -63,8 +63,8 @@ CphisError CphisScaleSolverSetup_LU(CphisScaleSolver solver)
   }
 
   CphisError err;
-  CphisIndex *cols;
-  CphisScalar *vals;
+  const CphisIndex *cols;
+  const CphisScalar *vals;
   CphisIndex numEntries;
   CphisScalar *denseA = solver->data;
   for (CphisIndex i = 0; i < numRows; i++) {

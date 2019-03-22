@@ -90,6 +90,40 @@ CphisError CphisErrorMsg(
         line
       );
       break;
+    case CPHIS_ERROR_IN_THREAD:
+      CphisPrintf(
+        "CPHIS error: An error occured inside an OpenMP region (%s(), %s:%d)\n",
+        func,
+        file,
+        line
+      );
+      break;
+    case CPHIS_TEST_FAILED:
+      CphisPrintf(
+        "CPHIS error: Test failed (%s(), %s:%d)\n",
+        func,
+        file,
+        line
+      );
+      break;
+    #ifdef CPHIS_HAVE_TPETRA
+    case CPHIS_TPETRA_ERROR:
+      CphisPrintf(
+        "CPHIS error: Caught an exception from Tpetra (%s(), %s:%d)\n",
+        func,
+        file,
+        line
+      );
+      break;
+    #endif
+    case CPHIS_MPI_ERROR:
+      CphisPrintf(
+        "CPHIS error: An error occured calling an MPI function (%s(), %s:%d)\n",
+        func,
+        file,
+        line
+      );
+      break;
     default:
       CphisPrintf(
         "CPHIS error: Unknown error (%s(), %s:%d)\n",

@@ -2,6 +2,9 @@
 
 #include <cphis.h>
 #include <linalg.h>
+#ifdef CPHIS_HAVE_TPETRA
+#include <cphis_tpetra.h>
+#endif
 #include <stdlib.h>
 
 CphisError CphisVecCreate(
@@ -27,6 +30,11 @@ CphisError CphisVecCreate(
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecCreate_default(vec, numElements, numLocalDOF);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecCreate_Tpetra(vec, numElements, elements, numLocalDOF);
+    break;
+  #endif
   default:
     err = CPHIS_UNKNOWN_TYPE;
     break;
@@ -47,6 +55,11 @@ CphisError CphisVecDestroy(CphisVec vec)
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecDestroy_default(vec);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecDestroy_Tpetra(vec);
+    break;
+  #endif
   default:
     err = CPHIS_UNKNOWN_TYPE;
     break;
@@ -77,6 +90,11 @@ CphisError CphisVecNorm2(const CphisVec x, CphisReal *norm2)
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecNorm2_default(x, norm2);CPHISCHECK(err);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecNorm2_Tpetra(x, norm2);CPHISCHECK(err);
+    break;
+  #endif
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
     break;
@@ -94,6 +112,11 @@ CphisError CphisVecDot(const CphisVec x, const CphisVec y, CphisScalar *dot)
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecDot_default(x, y, dot);CPHISCHECK(err);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecDot_Tpetra(x, y, dot);CPHISCHECK(err);
+    break;
+  #endif
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
     break;
@@ -111,6 +134,11 @@ CphisError CphisVecAXPY(CphisScalar a, const CphisVec x, CphisVec y)
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecAXPY_default(a, x, y);CPHISCHECK(err);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecAXPY_Tpetra(a, x, y);CPHISCHECK(err);
+    break;
+  #endif
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
     break;
@@ -133,6 +161,11 @@ CphisError CphisVecAXPBY(
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecAXPBY_default(a, x, b, y);CPHISCHECK(err);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecAXPBY_Tpetra(a, x, b, y);CPHISCHECK(err);
+    break;
+  #endif
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
     break;
@@ -148,6 +181,11 @@ CphisError CphisVecScale(CphisVec x, CphisScalar a)
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecScale_default(x, a);CPHISCHECK(err);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecScale_Tpetra(x, a);CPHISCHECK(err);
+    break;
+  #endif
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
     break;
@@ -163,6 +201,11 @@ CphisError CphisVecSetAll(CphisVec vec, CphisScalar val)
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecSetAll_default(vec, val);CPHISCHECK(err);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecSetAll_Tpetra(vec, val);CPHISCHECK(err);
+    break;
+  #endif
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
     break;
@@ -180,6 +223,11 @@ CphisError CphisVecAssign(const CphisVec x, CphisVec y)
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecAssign_default(x, y);CPHISCHECK(err);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecAssign_Tpetra(x, y);CPHISCHECK(err);
+    break;
+  #endif
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
     break;
@@ -195,6 +243,11 @@ CphisError CphisVecGetData(const CphisVec vec, CphisScalar **data)
   case CPHIS_BACKEND_DEFAULT:
     err = CphisVecGetData_default(vec, data);CPHISCHECK(err);
     break;
+  #ifdef CPHIS_HAVE_TPETRA
+  case CPHIS_BACKEND_TPETRA:
+    err = CphisVecGetData_Tpetra(vec, data);CPHISCHECK(err);
+    break;
+  #endif
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
     break;

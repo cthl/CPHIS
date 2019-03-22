@@ -40,7 +40,11 @@ enum
   //! The exact error type cannot be determined.
   CPHIS_ERROR_IN_THREAD,
   //! Test failed. Only returned by tests, not by functions.
-  CPHIS_TEST_FAILED
+  CPHIS_TEST_FAILED,
+  //! A call to a Tpetra (Trilinos) function failed.
+  CPHIS_TPETRA_ERROR,
+  //! A call to MPI failed.
+  CPHIS_MPI_ERROR
 };
 //! @brief CPHIS error type
 //! @warning Use the `CPHISERRORCMP` macro to compare error codes.
@@ -93,8 +97,8 @@ typedef enum
 {
   //! Default stand-alone backend for testing
   CPHIS_BACKEND_DEFAULT,
-  //! Trilinos (Tpetra) backend
-  CPHIS_BACKEND_TRILINOS
+  //! Tpetra (Trilinos) backend
+  CPHIS_BACKEND_TPETRA
 } CphisBackendType;
 
 // Forward declaration
@@ -181,8 +185,8 @@ CphisError CphisMatVec(const CphisMat A, const CphisVec x, CphisVec y);
 CphisError CphisMatGetData(
              const CphisMat mat,
              CphisIndex row,
-             CphisIndex **cols,
-             CphisScalar **vals,
+             const CphisIndex **cols,
+             const CphisScalar **vals,
              CphisIndex *numEntries
            );
 //! @brief Set (or add) a matrix entry.

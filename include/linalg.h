@@ -113,8 +113,8 @@ CphisError CphisMatVec_default(const CphisMat A, const CphisVec x, CphisVec y);
 CphisError CphisMatGetData_default(
              const CphisMat mat,
              CphisIndex row,
-             CphisIndex **cols,
-             CphisScalar **vals,
+             const CphisIndex **cols,
+             const CphisScalar **vals,
              CphisIndex *numEntries
            );
 CphisError CphisMatSet_default(

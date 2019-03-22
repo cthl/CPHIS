@@ -68,8 +68,8 @@ CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
   }
 
   // Extract diagonal.
-  CphisIndex *cols;
-  CphisScalar *vals;
+  const CphisIndex *cols;
+  const CphisScalar *vals;
   CphisIndex numEntries;
   for (CphisIndex i = 0; i < numRows; i++) {
     err = CphisMatGetData(solver->A, i, &cols, &vals, &numEntries);
@@ -119,8 +119,8 @@ CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
 
   // Extract block diagonal.
   CphisError err;
-  CphisIndex *cols;
-  CphisScalar *vals;
+  const CphisIndex *cols;
+  const CphisScalar *vals;
   CphisIndex numEntries;
   for (CphisIndex i = 0; i < numRows; i++) {
     err = CphisMatGetData(solver->A, i, &cols, &vals, &numEntries);

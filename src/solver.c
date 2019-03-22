@@ -220,8 +220,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
     }
     
     // Get matrix entries in this row.
-    CphisIndex *cols;
-    CphisScalar *vals;
+    const CphisIndex *cols;
+    const CphisScalar *vals;
     CphisIndex numEntries;
     err = CphisMatGetData(
             solver->A,

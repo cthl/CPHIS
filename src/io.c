@@ -268,8 +268,8 @@ CphisError CphisMatPrint(const CphisMat mat)
   }
 
   CphisError err;
-  CphisIndex *cols;
-  CphisScalar *vals;
+  const CphisIndex *cols;
+  const CphisScalar *vals;
   CphisIndex numEntries;
   for (CphisIndex k = 0; k < mat->numElements; k++) {
     for (int l = 0; l < mat->numLocalDOF; l++) {

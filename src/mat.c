@@ -93,8 +93,8 @@ CphisError CphisMatVec(const CphisMat A, const CphisVec x, CphisVec y)
 CphisError CphisMatGetData(
              const CphisMat mat,
              CphisIndex row,
-             CphisIndex **cols,
-             CphisScalar **vals,
+             const CphisIndex **cols,
+             const CphisScalar **vals,
              CphisIndex *numEntries
            )
 {
