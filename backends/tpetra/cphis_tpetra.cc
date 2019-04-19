@@ -311,9 +311,11 @@ CphisError CphisMatSet_Tpetra(
 
   // The Tpetra matrix has no column map at this point, so we have to use
   // global indices to set the entry.
-  const int localDOF = i%mat->numLocalDOF;
-  const CphisIndex globalElement = mat->elements[i/mat->numLocalDOF];
-  const CphisIndex iGlobal = mat->numLocalDOF*globalElement + localDOF;
+  const CphisIndex iGlobal = CphisIndexLocalToGlobal(
+                               i,
+                               mat->elements,
+                               mat->numLocalDOF
+                             );
 
   try {
     matMat->insertGlobalValues(iGlobal, 1, &aij, &j);

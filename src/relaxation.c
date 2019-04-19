@@ -3,6 +3,7 @@
 #include <cphis.h>
 #include <linalg.h>
 #include <scale_solver.h>
+#include <aux.h>
 #include <stdlib.h>
 
 CphisError CphisScaleSolverDestroy_Jacobi(CphisScaleSolver solver)
@@ -34,11 +35,6 @@ CphisError CphisScaleSolverDestroy_BlockJacobi(CphisScaleSolver solver)
 
 CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
 {
-  // Smoother has not been implemented for distributed setting yet.
-  if (solver->A->type != CPHIS_BACKEND_DEFAULT) {
-    CPHISCHECK(CPHIS_INCOMPATIBLE);
-  }
-
   solver->data = malloc(sizeof(struct _CphisScaleSolverData_Jacobi));
   if (!solver->data) {
     CPHISCHECK(CPHIS_FAILED_ALLOC);
@@ -81,8 +77,13 @@ CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
       CPHISCHECK(err);
     }
     // Find diagonal entry.
+    const CphisIndex iGlobal = CphisIndexLocalToGlobal(
+                                 i,
+                                 solver->A->elements,
+                                 solver->A->numLocalDOF
+                               );
     for (CphisIndex j = 0; j < numEntries; j++) {
-      if (i == cols[j]) {
+      if (iGlobal == cols[j]) {
         data->invD[i] = 1.0/vals[j];
         break;
       }
@@ -94,11 +95,6 @@ CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
 
 CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
 {
-  // Smoother has not been implemented for distributed setting yet.
-  if (solver->A->type != CPHIS_BACKEND_DEFAULT) {
-    CPHISCHECK(CPHIS_INCOMPATIBLE);
-  }
-
   solver->data = malloc(sizeof(struct _CphisScaleSolverData_BlockJacobi));
   if (!solver->data) {
     CPHISCHECK(CPHIS_FAILED_ALLOC);
@@ -130,12 +126,17 @@ CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
       free(solver->data);
       CPHISCHECK(err);
     }
-    const CphisIndex blockIndex = i/numLocalDOF;
+    const CphisIndex iGlobal = CphisIndexLocalToGlobal(
+                                 i,
+                                 solver->A->elements,
+                                 solver->A->numLocalDOF
+                               );
+    const CphisIndex blockIndex = iGlobal/numLocalDOF;
     // Find block diagonal entries.
     for (CphisIndex j = 0; j < numEntries; j++) {
       if (blockIndex == cols[j]/numLocalDOF) {
         // Compute row and column index within block.
-        const CphisIndex iBlock = i%numLocalDOF;
+        const CphisIndex iBlock = iGlobal%numLocalDOF;
         const CphisIndex jBlock = cols[j]%numLocalDOF;
         // Write entry to (dense) block matrix.
         data->blocks[blockIndex*blockSize + iBlock*numLocalDOF + jBlock]

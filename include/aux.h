@@ -13,4 +13,14 @@ void CphisPrintHline(int thick);
 CphisError CphisVecPrint(const CphisVec vec);
 CphisError CphisMatPrint(const CphisMat mat);
 
+// Convert a local index to a global index given a list of local elements.
+inline CphisIndex CphisIndexLocalToGlobal(
+                    CphisIndex localIndex,
+                    const CphisIndex *elements,
+                    int numLocalDOF
+                  )
+{
+  return numLocalDOF*elements[localIndex/numLocalDOF] + localIndex%numLocalDOF;
+}
+
 #endif // __AUX_H__
