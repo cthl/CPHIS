@@ -11,11 +11,46 @@ int main()
   const CphisIndex n2 = n*n;
   CphisMat A;
   CphisVec u, ux, f, r;
-  err = CphisMatCreate(&A, n2, NULL, 1, CPHIS_BACKEND_DEFAULT);CPHISCHECK(err);
-  err = CphisVecCreate(&u, n2, NULL, 1, CPHIS_BACKEND_DEFAULT);CPHISCHECK(err);
-  err = CphisVecCreate(&ux, n2, NULL, 1, CPHIS_BACKEND_DEFAULT);CPHISCHECK(err);
-  err = CphisVecCreate(&f, n2, NULL, 1, CPHIS_BACKEND_DEFAULT);CPHISCHECK(err);
-  err = CphisVecCreate(&r, n2, NULL, 1, CPHIS_BACKEND_DEFAULT);CPHISCHECK(err);
+  err = CphisMatCreate(
+          &A,
+          n2,
+          NULL,
+          1,
+          CPHIS_BACKEND_DEFAULT,
+          NULL
+        );CPHISCHECK(err);
+  err = CphisVecCreate(
+          &u,
+          n2,
+          NULL,
+          1,
+          CPHIS_BACKEND_DEFAULT,
+          NULL
+        );CPHISCHECK(err);
+  err = CphisVecCreate(
+          &ux,
+          n2,
+          NULL,
+          1,
+          CPHIS_BACKEND_DEFAULT,
+          NULL
+        );CPHISCHECK(err);
+  err = CphisVecCreate(
+          &f,
+          n2,
+          NULL,
+          1,
+          CPHIS_BACKEND_DEFAULT,
+          NULL
+        );CPHISCHECK(err);
+  err = CphisVecCreate(
+          &r,
+          n2,
+          NULL,
+          1,
+          CPHIS_BACKEND_DEFAULT,
+          NULL
+        );CPHISCHECK(err);
   err = getPoisson2dSystem(n, A, f, u, ux);
 
   // Compute initial residual norm.

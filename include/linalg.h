@@ -45,6 +45,9 @@ struct _CphisVec
   // This could be as simple as an array of scalars or as complex as a
   // distributed vector from a package like Trilinos.
   void *vec;
+  // Flag indicating if the underlying vector is owned by this handle, i.e.,
+  // if it will be deallocated when the handle is destroyed
+  int owned;
 };
 
 // Default vector implementation
@@ -86,6 +89,9 @@ struct _CphisMat
   void *mat;
   // A flag to determine whether or not the matrix has been finalized.
   int finalized;
+  // Flag indicating if the underlying matrix is owned by this handle, i.e.,
+  // if it will be deallocated when the handle is destroyed
+  int owned;
 };
 
 // Internal matrix structure for the default implementation

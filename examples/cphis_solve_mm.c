@@ -47,7 +47,8 @@ int main(int argc, char **argv)
           numElements,
           NULL,
           numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          CPHIS_BACKEND_DEFAULT,
+          NULL
         );CPHISCHECK(err);
   err = CphisVecSetAll(x, 0.0);CPHISCHECK(err);
 

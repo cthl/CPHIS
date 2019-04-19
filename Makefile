@@ -4,7 +4,7 @@ LDFLAGS=-L. -lm -lcphis -fopenmp
 
 # Uncomment to enable the Tpetra (Trilinos) linear algebra backend.
 # Tests and examples cannot be compiled when this is enabled!
-CFLAGS+=-Ibackends/tpetra -DCPHIS_HAVE_TPETRA
+#CFLAGS+=-Ibackends/tpetra -DCPHIS_HAVE_TPETRA
 
 default: libcphis.a
 

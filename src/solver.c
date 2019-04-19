@@ -113,7 +113,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFScale,
-            type
+            type,
+            NULL
           );
     if (err) {
       CphisSolverCleanupScale(solver, scale);
@@ -129,7 +130,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFResidual,
-            type
+            type,
+            NULL
           );
     if (err) {
       CphisSolverCleanupScale(solver, scale);
@@ -140,7 +142,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFResidual,
-            type
+            type,
+            NULL
           );
     if (err) {
       CphisSolverCleanupScale(solver, scale);
@@ -151,7 +154,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFResidual,
-            type
+            type,
+            NULL
           );
     if (err) {
       CphisSolverCleanupScale(solver, scale);
@@ -168,7 +172,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFScale,
-            type
+            type,
+            NULL
           );
     if (err) {
       CphisSolverCleanupScale(solver, scale);
@@ -179,7 +184,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFScale,
-            type
+            type,
+            NULL
           );
     if (err) {
       CphisSolverCleanupScale(solver, scale);
@@ -190,7 +196,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             minLocalDOFScale,
-            type
+            type,
+            NULL
           );
     if (err) {
       CphisSolverCleanupScale(solver, scale);
@@ -201,7 +208,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFScale,
-            type
+            type,
+            NULL
           );
     if (err) {
       CphisSolverCleanupScale(solver, scale);
@@ -380,7 +388,8 @@ CphisError CphisSolverCreate(
           A->numElements,
           A->elements,
           A->numLocalDOF,
-          A->type
+          A->type,
+          NULL
         );CPHISCHECK(err);
 
   // Allocate arrays for matrix and vector handles.

@@ -59,7 +59,8 @@ CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) {
     free(data->invD);
@@ -153,7 +154,8 @@ CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) {
     free(data->blocks);
@@ -165,7 +167,8 @@ CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) {
     CphisVecDestroy(data->r);

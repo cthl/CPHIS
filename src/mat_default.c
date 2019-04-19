@@ -11,6 +11,7 @@ CphisError CphisMatCreate_default(
              int numLocalDOF
            )
 {
+
   (*mat)->mat = malloc(sizeof(struct _CphisMat_default));
   if (!(*mat)->mat) {
     CPHISCHECK(CPHIS_FAILED_ALLOC);

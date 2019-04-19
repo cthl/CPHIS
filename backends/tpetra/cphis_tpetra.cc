@@ -24,14 +24,6 @@ typedef Tpetra::CrsMatrix<
           TpetraNode
         > TpetraMat;
 
-struct _CphisVec_Tpetra
-{
-  // Pointer to the actual Tpetra vector
-  TpetraVec *vec;
-  // Was this vector created by CPHIS or passed by the user?
-  bool owned;
-};
-
 static CphisError createTpetraMap(
                     CphisIndex numElements,
                     const CphisIndex *elements,
@@ -81,21 +73,12 @@ CphisError CphisVecCreate_Tpetra(
              CphisVec *vec,
              CphisIndex numElements,
              const CphisIndex *elements,
-             int numLocalDOF
+             int numLocalDOF,
+             void *from
            )
 {
-  CphisError err;
-
   try {
-    (*vec)->vec = new struct _CphisVec_Tpetra;
-  }
-  catch (...) {
-    CPHISCHECK(CPHIS_FAILED_ALLOC);
-  }
-
-  struct _CphisVec_Tpetra *vecVec = (struct _CphisVec_Tpetra*) (*vec)->vec;
-
-  try {
+    CphisError err;
     Teuchos::RCP<const TpetraMap> map;
     err = createTpetraMap(
             numElements,
@@ -103,32 +86,26 @@ CphisError CphisVecCreate_Tpetra(
             numLocalDOF,
             map
           );CPHISCHECK(err);
-    vecVec->vec = new TpetraVec(map);
+    (*vec)->vec = (void*) new TpetraVec(map);
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
   }
-  vecVec->owned = true;
 
   return CPHIS_SUCCESS;
 }
 
 CphisError CphisVecDestroy_Tpetra(CphisVec vec)
 {
-  struct _CphisVec_Tpetra *vecVec = (struct _CphisVec_Tpetra*) vec->vec;
-
-  if (vecVec->owned) {
-    delete vecVec->vec;
-  }
-  delete vec->vec;
+  delete (TpetraVec*) vec->vec;
 }
 
 CphisError CphisVecNorm2_Tpetra(const CphisVec x, CphisReal *norm2)
 {
-  const struct _CphisVec_Tpetra *xVec = (const struct _CphisVec_Tpetra*) x->vec;
+  const TpetraVec *xVec = (TpetraVec*) x->vec;
 
   try {
-    *norm2 = xVec->vec->norm2();
+    *norm2 = xVec->norm2();
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -143,11 +120,11 @@ CphisError CphisVecDot_Tpetra(
              CphisScalar *dot
            )
 {
-  const struct _CphisVec_Tpetra *xVec = (const struct _CphisVec_Tpetra*) x->vec;
-  const struct _CphisVec_Tpetra *yVec = (const struct _CphisVec_Tpetra*) y->vec;
+  const TpetraVec *xVec = (TpetraVec*) x->vec;
+  const TpetraVec *yVec = (TpetraVec*) y->vec;
 
   try {
-    *dot = xVec->vec->dot(*yVec->vec);
+    *dot = xVec->dot(*yVec);
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -158,11 +135,11 @@ CphisError CphisVecDot_Tpetra(
 
 CphisError CphisVecAXPY_Tpetra(CphisScalar a, const CphisVec x, CphisVec y)
 {
-  const struct _CphisVec_Tpetra *xVec = (const struct _CphisVec_Tpetra*) x->vec;
-  struct _CphisVec_Tpetra *yVec = (struct _CphisVec_Tpetra*) y->vec;
+  const TpetraVec *xVec = (TpetraVec*) x->vec;
+  TpetraVec *yVec = (TpetraVec*) y->vec;
 
   try {
-    yVec->vec->update(a, *xVec->vec, 1.0);
+    yVec->update(a, *xVec, 1.0);
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -178,11 +155,11 @@ CphisError CphisVecAXPBY_Tpetra(
              CphisVec y
            )
 {
-  const struct _CphisVec_Tpetra *xVec = (const struct _CphisVec_Tpetra*) x->vec;
-  struct _CphisVec_Tpetra *yVec = (struct _CphisVec_Tpetra*) y->vec;
+  const TpetraVec *xVec = (TpetraVec*) x->vec;
+  TpetraVec *yVec = (TpetraVec*) y->vec;
 
   try {
-    yVec->vec->update(a, *xVec->vec, b);
+    yVec->update(a, *xVec, b);
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -193,10 +170,10 @@ CphisError CphisVecAXPBY_Tpetra(
 
 CphisError CphisVecScale_Tpetra(CphisVec x, CphisScalar a)
 {
-  struct _CphisVec_Tpetra *xVec = (struct _CphisVec_Tpetra*) x->vec;
+  TpetraVec *xVec = (TpetraVec*) x->vec;
 
   try{
-    xVec->vec->scale(a);
+    xVec->scale(a);
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -207,10 +184,10 @@ CphisError CphisVecScale_Tpetra(CphisVec x, CphisScalar a)
 
 CphisError CphisVecSetAll_Tpetra(CphisVec vec, CphisScalar val)
 {
-  struct _CphisVec_Tpetra *vecVec = (struct _CphisVec_Tpetra*) vec->vec;
+  TpetraVec *vecVec = (TpetraVec*) vec->vec;
 
   try {
-    vecVec->vec->putScalar(val);
+    vecVec->putScalar(val);
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -221,11 +198,11 @@ CphisError CphisVecSetAll_Tpetra(CphisVec vec, CphisScalar val)
 
 CphisError CphisVecAssign_Tpetra(const CphisVec x, CphisVec y)
 {
-  const struct _CphisVec_Tpetra *xVec = (const struct _CphisVec_Tpetra*) x->vec;
-  struct _CphisVec_Tpetra *yVec = (struct _CphisVec_Tpetra*) y->vec;
+  const TpetraVec *xVec = (TpetraVec*) x->vec;
+  TpetraVec *yVec = (TpetraVec*) y->vec;
 
   try {
-    *yVec->vec = *xVec->vec;
+    *yVec = *xVec;
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -236,10 +213,10 @@ CphisError CphisVecAssign_Tpetra(const CphisVec x, CphisVec y)
 
 CphisError CphisVecGetData_Tpetra(const CphisVec vec, CphisScalar **data)
 {
-  struct _CphisVec_Tpetra *vecVec = (struct _CphisVec_Tpetra*) vec->vec;
+  TpetraVec *vecVec = (TpetraVec*) vec->vec;
 
   try {
-    *data = vecVec->vec->getDataNonConst().get();
+    *data = vecVec->getDataNonConst().get();
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -248,33 +225,16 @@ CphisError CphisVecGetData_Tpetra(const CphisVec vec, CphisScalar **data)
   return CPHIS_SUCCESS;
 }
 
-struct _CphisMat_Tpetra
-{
-  // Pointer to the actual Tpetra matrix
-  TpetraMat *mat;
-  // Was this matrix created by CPHIS or passed by the user?
-  bool owned;
-};
-
 CphisError CphisMatCreate_Tpetra(
              CphisMat *mat,
              CphisIndex numElements,
              const CphisIndex *elements,
-             int numLocalDOF
+             int numLocalDOF,
+             void *from
            )
 {
-  CphisError err;
-
   try {
-    (*mat)->mat = new struct _CphisMat_Tpetra;
-  }
-  catch (...) {
-    CPHISCHECK(CPHIS_FAILED_ALLOC);
-  }
-
-  struct _CphisMat_Tpetra *matMat = (struct _CphisMat_Tpetra*) (*mat)->mat;
-
-  try {
+    CphisError err;
     Teuchos::RCP<const TpetraMap> map;
     err = createTpetraMap(
             numElements,
@@ -282,34 +242,28 @@ CphisError CphisMatCreate_Tpetra(
             numLocalDOF,
             map
           );CPHISCHECK(err);
-    matMat->mat = new TpetraMat(map, 0);
+    (*mat)->mat = (void*) new TpetraMat(map, 0);
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
   }
-  matMat->owned = true;
 
   return CPHIS_SUCCESS;
 }
 
 CphisError CphisMatDestroy_Tpetra(CphisMat mat)
 {
-  struct _CphisMat_Tpetra *matMat = (struct _CphisMat_Tpetra*) mat->mat;
-
-  if (matMat->owned) {
-    delete matMat->mat;
-  }
-  delete mat->mat;
+  delete (TpetraMat*) mat->mat;
 }
 
 CphisError CphisMatVec_Tpetra(const CphisMat A, const CphisVec x, CphisVec y)
 {
-  const struct _CphisMat_Tpetra *AMat = (const struct _CphisMat_Tpetra*) A->mat;
-  const struct _CphisVec_Tpetra *xVec = (const struct _CphisVec_Tpetra*) x->vec;
-  struct _CphisVec_Tpetra *yVec = (struct _CphisVec_Tpetra*) y->vec;
+  const TpetraMat *AMat = (TpetraMat*) A->mat;
+  const TpetraVec *xVec = (TpetraVec*) x->vec;
+  TpetraVec *yVec = (TpetraVec*) y->vec;
 
   try {
-    AMat->mat->apply(*xVec->vec, *yVec->vec);
+    AMat->apply(*xVec, *yVec);
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -326,16 +280,15 @@ CphisError CphisMatGetData_Tpetra(
              CphisIndex *numEntries
            )
 {
-  const struct _CphisMat_Tpetra *matMat;
-  matMat = (const struct _CphisMat_Tpetra*) mat->mat;
+  const TpetraMat *matMat = (TpetraMat*) mat->mat;
 
   try {
-    const int err = matMat->mat->getLocalRowViewRaw(
-                                   row,
-                                   *numEntries,
-                                   *cols,
-                                   *vals
-                                 );
+    const int err = matMat->getLocalRowViewRaw(
+                              row,
+                              *numEntries,
+                              *cols,
+                              *vals
+                            );
     if (err) {
       CPHISCHECK(CPHIS_TPETRA_ERROR);
     }
@@ -354,15 +307,30 @@ CphisError CphisMatSet_Tpetra(
              CphisScalar aij
            )
 {
+  TpetraMat *matMat = (TpetraMat*) mat->mat;
+
+  // The Tpetra matrix has no column map at this point, so we have to use
+  // global indices to set the entry.
+  const int localDOF = i%mat->numLocalDOF;
+  const CphisIndex globalElement = mat->elements[i/mat->numLocalDOF];
+  const CphisIndex iGlobal = mat->numLocalDOF*globalElement + localDOF;
+
+  try {
+    matMat->insertGlobalValues(iGlobal, 1, &aij, &j);
+  }
+  catch (...) {
+    CPHISCHECK(CPHIS_TPETRA_ERROR);
+  }
+
   return CPHIS_SUCCESS;
 }
 
 CphisError CphisMatFinalize_Tpetra(CphisMat mat)
 {
-  struct _CphisMat_Tpetra *matMat = (struct _CphisMat_Tpetra*) mat->mat;
+  TpetraMat *matMat = (TpetraMat*) mat->mat;
 
   try {
-    matMat->mat->fillComplete();
+    matMat->fillComplete();
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);

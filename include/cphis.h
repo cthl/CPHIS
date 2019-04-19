@@ -36,6 +36,8 @@ enum
   CPHIS_FAILED_ALLOC,
   //! Feature has not been implemented.
   CPHIS_NOT_IMPLEMENTED,
+  //! The desired backend has not been enabled.
+  CPHIS_MISSING_BACKEND,
   //! An error occured inside a thread.
   //! The exact error type cannot be determined.
   CPHIS_ERROR_IN_THREAD,
@@ -114,14 +116,16 @@ typedef struct _CphisVec* CphisVec;
 //!                 `NULL`.
 //! @param numLocalDOF Number of degrees of freedom per element
 //! @param type The type of linear algebra backend to be used for this vector
-//! @note Users should never have to use this method. Instead they should use
-//!       the `CphisVecFromXXX` method that fits their linear algebra backend.
+//! @param from Optional pointer to an existing vector that was created using
+//!             the backend specified by `type`. If not `NULL`, this function
+//!             will create a non-owning handle around the existing vector.
 CphisError CphisVecCreate(
              CphisVec *vec,
              CphisIndex numElements,
              const CphisIndex *elements,
              int numLocalDOF,
-             CphisBackendType type
+             CphisBackendType type,
+             void *from
            );
 //! Destroy a vector.
 CphisError CphisVecDestroy(CphisVec vec);
@@ -164,14 +168,13 @@ struct _CphisMat;
 typedef struct _CphisMat* CphisMat;
 //! @brief Create a matrix.
 //! See @link CphisVecCreate @endlink for details.
-//! @note Users should never have to use this method. Instead they should use
-//!       the `CphisMatFromXXX` method that fits their linear algebra backend.
 CphisError CphisMatCreate(
              CphisMat *mat,
              CphisIndex numElements,
              const CphisIndex *elements,
              int numLocalDOF,
-             CphisBackendType type
+             CphisBackendType type,
+             void *from
            );
 //! Destroy a matrix.
 CphisError CphisMatDestroy(CphisMat mat);

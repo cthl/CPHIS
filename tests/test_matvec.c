@@ -17,9 +17,30 @@ int main()
   // Create matrix and vectors.
   CphisMat A;
   CphisVec x, y;
-  err = CphisMatCreate(&A, n2, NULL, 1, CPHIS_BACKEND_DEFAULT);CPHISCHECK(err);
-  err = CphisVecCreate(&x, n2, NULL, 1, CPHIS_BACKEND_DEFAULT);CPHISCHECK(err);
-  err = CphisVecCreate(&y, n2, NULL, 1, CPHIS_BACKEND_DEFAULT);CPHISCHECK(err);
+  err = CphisMatCreate(
+          &A,
+          n2,
+          NULL,
+          1,
+          CPHIS_BACKEND_DEFAULT,
+          NULL
+        );CPHISCHECK(err);
+  err = CphisVecCreate(
+          &x,
+          n2,
+          NULL,
+          1,
+          CPHIS_BACKEND_DEFAULT,
+          NULL
+        );CPHISCHECK(err);
+  err = CphisVecCreate(
+          &y,
+          n2,
+          NULL,
+          1,
+          CPHIS_BACKEND_DEFAULT,
+          NULL
+        );CPHISCHECK(err);
 
   err = getPoisson2dSystem(n, A, NULL, x, NULL);
 

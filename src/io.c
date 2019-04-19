@@ -86,7 +86,8 @@ CphisError CphisVecFromMatrixMarket(
           numRows/numLocalDOF,
           NULL,
           numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          CPHIS_BACKEND_DEFAULT,
+          NULL
         );
   if (err) {
     free(buffer);
@@ -174,7 +175,8 @@ CphisError CphisMatFromMatrixMarket(
           numRows/numLocalDOF,
           NULL,
           numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          CPHIS_BACKEND_DEFAULT,
+          NULL
         );
   if (err) {
     free(buffer);

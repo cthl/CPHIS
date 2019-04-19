@@ -90,6 +90,14 @@ CphisError CphisErrorMsg(
         line
       );
       break;
+    case CPHIS_MISSING_BACKEND:
+      CphisPrintf(
+        "CPHIS error: The desired backend has not been enabled (%s(), %s:%d)\n",
+        func,
+        file,
+        line
+      );
+      break;
     case CPHIS_ERROR_IN_THREAD:
       CphisPrintf(
         "CPHIS error: An error occured inside an OpenMP region (%s(), %s:%d)\n",

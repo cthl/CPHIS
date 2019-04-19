@@ -40,10 +40,6 @@ CphisError CphisScaleSolverDestroy_BiCGStab(CphisScaleSolver solver)
 
 CphisError CphisScaleSolverSetup_CG(CphisScaleSolver solver)
 {
-  if (solver->A->type != CPHIS_BACKEND_DEFAULT) {
-    CPHISCHECK(CPHIS_INCOMPATIBLE);
-  }
-
   solver->data = malloc(sizeof(struct _CphisScaleSolverData_CG));
   if (!solver->data) {
     CPHISCHECK(CPHIS_FAILED_ALLOC);
@@ -62,7 +58,8 @@ CphisError CphisScaleSolverSetup_CG(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_cg_cleanup;
   err = CphisVecCreate(
@@ -70,7 +67,8 @@ CphisError CphisScaleSolverSetup_CG(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_cg_cleanup;
   err = CphisVecCreate(
@@ -78,7 +76,8 @@ CphisError CphisScaleSolverSetup_CG(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_cg_cleanup;
 
@@ -121,7 +120,8 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_bicgstab_cleanup;
   err = CphisVecCreate(
@@ -129,7 +129,8 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_bicgstab_cleanup;
   err = CphisVecCreate(
@@ -137,7 +138,8 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_bicgstab_cleanup;
   err = CphisVecCreate(
@@ -145,7 +147,8 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_bicgstab_cleanup;
   err = CphisVecCreate(
@@ -153,7 +156,8 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_bicgstab_cleanup;
   err = CphisVecCreate(
@@ -161,7 +165,8 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_bicgstab_cleanup;
   err = CphisVecCreate(
@@ -169,7 +174,8 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           solver->A->numElements,
           solver->A->elements,
           solver->A->numLocalDOF,
-          CPHIS_BACKEND_DEFAULT
+          solver->A->type,
+          NULL
         );
   if (err) goto cphis_scale_solver_setup_bicgstab_cleanup;
 
