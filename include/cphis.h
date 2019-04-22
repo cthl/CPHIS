@@ -3,6 +3,11 @@
 #ifndef __CPHIS_H__
 #define __CPHIS_H__
 
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
 //! Basic index type
 typedef int CphisIndex;
 //! Basic scalar type
@@ -437,5 +442,8 @@ CphisError CphisSolverSolve(
              CphisReal *residual,
              int *iter
            );
+#ifdef __cplusplus
+} // extern "C"
+#endif
 
 #endif // __CPHIS_H__
