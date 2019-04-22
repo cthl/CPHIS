@@ -38,7 +38,7 @@ struct _CphisVec
   // Number of elements (on this rank)
   CphisIndex numElements;
   // Array of global element indices owned by this process
-  CphisIndex *elements;
+  const CphisIndex *elements;
   // Number of local degrees of freedom per element
   int numLocalDOF;
   // Pointer to the actual vector.
@@ -82,7 +82,7 @@ struct _CphisMat
   // Matrix dimensions.
   CphisIndex numElements;
   // Array of global element indices owned by this process
-  CphisIndex *elements;
+  const CphisIndex *elements;
   // Number of local degrees of freedom per element
   int numLocalDOF;
   // Pointer to the actual matrix (see vector class).
