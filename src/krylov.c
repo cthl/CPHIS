@@ -40,6 +40,11 @@ CphisError CphisScaleSolverDestroy_BiCGStab(CphisScaleSolver solver)
 
 CphisError CphisScaleSolverSetup_CG(CphisScaleSolver solver)
 {
+  solver->data = malloc(sizeof(struct _CphisScaleSolverData_CG));
+  if (!solver->data) {
+    CPHISCHECK(CPHIS_FAILED_ALLOC);
+  }
+
   struct _CphisScaleSolverData_CG *data = solver->data;
 
   // Make sure that cleanup is safe at all times.
