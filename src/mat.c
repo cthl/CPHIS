@@ -23,7 +23,7 @@ CphisError CphisMatCreate(
 
   (*mat)->type = type;
   (*mat)->numElements = numElements;
-  (*mat)->elements = NULL;
+  (*mat)->elements = elements;
   (*mat)->numLocalDOF = numLocalDOF;
   (*mat)->finalized = 0;
   (*mat)->owned = (from == NULL);
