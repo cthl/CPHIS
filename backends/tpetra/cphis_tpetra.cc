@@ -3,6 +3,7 @@
 #include <cphis.h>
 #include <cphis_tpetra.h>
 #include <linalg.h>
+#include <aux.h>
 #include <KokkosCompat_ClassicNodeAPI_Wrapper.hpp>
 #include <Tpetra_Vector.hpp>
 #include <Tpetra_CrsMatrix.hpp>
@@ -73,8 +74,7 @@ CphisError CphisVecCreate_Tpetra(
              CphisVec *vec,
              CphisIndex numElements,
              const CphisIndex *elements,
-             int numLocalDOF,
-             void *from
+             int numLocalDOF
            )
 {
   try {
@@ -98,6 +98,8 @@ CphisError CphisVecCreate_Tpetra(
 CphisError CphisVecDestroy_Tpetra(CphisVec vec)
 {
   delete (TpetraVec*) vec->vec;
+
+  return CPHIS_SUCCESS;
 }
 
 CphisError CphisVecNorm2_Tpetra(const CphisVec x, CphisReal *norm2)
@@ -202,7 +204,7 @@ CphisError CphisVecAssign_Tpetra(const CphisVec x, CphisVec y)
   TpetraVec *yVec = (TpetraVec*) y->vec;
 
   try {
-    *yVec = *xVec;
+    yVec->assign(*xVec);
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
@@ -229,8 +231,7 @@ CphisError CphisMatCreate_Tpetra(
              CphisMat *mat,
              CphisIndex numElements,
              const CphisIndex *elements,
-             int numLocalDOF,
-             void *from
+             int numLocalDOF
            )
 {
   try {
@@ -254,6 +255,8 @@ CphisError CphisMatCreate_Tpetra(
 CphisError CphisMatDestroy_Tpetra(CphisMat mat)
 {
   delete (TpetraMat*) mat->mat;
+
+  return CPHIS_SUCCESS;
 }
 
 CphisError CphisMatVec_Tpetra(const CphisMat A, const CphisVec x, CphisVec y)
