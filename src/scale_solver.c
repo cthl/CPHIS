@@ -43,6 +43,9 @@ CphisError CphisScaleSolverDestroy(CphisScaleSolver solver)
   case CPHIS_SCALE_SOLVER_BICGSTAB:
     err = CphisScaleSolverDestroy_BiCGStab(solver);
     break;
+  case CPHIS_SCALE_SOLVER_EXTERNAL:
+    err = CphisScaleSolverDestroy_External(solver);
+    break;
   default:
     err = CPHIS_UNKNOWN_TYPE;
     break;
@@ -95,6 +98,9 @@ CphisError CphisScaleSolverSetup(CphisScaleSolver solver, const CphisMat A)
     break;
   case CPHIS_SCALE_SOLVER_BICGSTAB:
     err = CphisScaleSolverSetup_BiCGStab(solver);CPHISCHECK(err);
+    break;
+  case CPHIS_SCALE_SOLVER_EXTERNAL:
+    err = CphisScaleSolverSetup_External(solver);CPHISCHECK(err);
     break;
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
@@ -169,10 +175,89 @@ CphisError CphisScaleSolverSolve(
             iter
           );CPHISCHECK(err);
     break;
+  case CPHIS_SCALE_SOLVER_EXTERNAL:
+    err = CphisScaleSolverSolve_External(
+            solver,
+            b,
+            x,
+            flag,
+            residual,
+            iter
+          );CPHISCHECK(err);
+    break;
   default:
     CPHISCHECK(CPHIS_UNKNOWN_TYPE);
     break;
   }
 
   return CPHIS_SUCCESS;
+}
+
+CphisError CphisScaleSolverSetExternal(
+             CphisScaleSolver solver,
+             CphisError (*setupFunc)(CphisScaleSolver, const CphisMat, void*),
+             CphisError (*solveFunc)(
+                          CphisScaleSolver,
+                          const CphisVec,
+                          CphisVec,
+                          CphisConvergenceFlag*,
+                          CphisReal*,
+                          int*,
+                          void*
+                        ),
+             void *context
+           )
+{
+  solver->data = malloc(sizeof(struct _CphisScaleSolverData_External));
+  if (!solver->data) {
+    CPHISCHECK(CPHIS_FAILED_ALLOC);
+  }
+
+  struct _CphisScaleSolverData_External *data = solver->data;
+
+  data->setupFunc = setupFunc;
+  data->solveFunc = solveFunc;
+  data->context = context;
+
+  return CPHIS_SUCCESS;
+}
+
+CphisError CphisScaleSolverDestroy_External(CphisScaleSolver solver)
+{
+  struct _CphisScaleSolverData_External *data = solver->data;
+
+  if (data) {
+    free(data);
+  }
+
+  return CPHIS_SUCCESS;
+}
+
+CphisError CphisScaleSolverSetup_External(CphisScaleSolver solver)
+{
+  CphisError err;
+
+  struct _CphisScaleSolverData_External *data = solver->data;
+
+  err = data->setupFunc(solver, solver->A, data->context);
+
+  return err;
+}
+
+CphisError CphisScaleSolverSolve_External(
+             CphisScaleSolver solver,
+             const CphisVec b,
+             CphisVec x,
+             CphisConvergenceFlag *flag,
+             CphisReal *residual,
+             int *iter
+           )
+{
+  CphisError err;
+
+  struct _CphisScaleSolverData_External *data = solver->data;
+
+  err = data->solveFunc(solver, b, x, flag, residual, iter, data->context);
+
+  return err;
 }

@@ -109,4 +109,33 @@ CphisError CphisScaleSolverSolve_BiCGStab(
              int *iter
            );
 
+struct _CphisScaleSolverData_External
+{
+  // Pointer to solver setup function
+  CphisError (*setupFunc)(CphisScaleSolver, const CphisMat, void*);
+  // Pointer to a function that calls the external solver
+  CphisError (*solveFunc)(
+               CphisScaleSolver,
+               const CphisVec,
+               CphisVec,
+               CphisConvergenceFlag*,
+               CphisReal*,
+               int*,
+               void*
+             );
+  // Pointer to the solver context
+  void *context;
+};
+
+CphisError CphisScaleSolverDestroy_External(CphisScaleSolver solver);
+CphisError CphisScaleSolverSetup_External(CphisScaleSolver solver);
+CphisError CphisScaleSolverSolve_External(
+             CphisScaleSolver solver,
+             const CphisVec b,
+             CphisVec x,
+             CphisConvergenceFlag *flag,
+             CphisReal *residual,
+             int *iter
+           );
+
 #endif // __SCALE_SOLVER_H__

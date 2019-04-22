@@ -240,7 +240,11 @@ typedef enum
   //! BiCGStab solver (unpreconditioned).
   //! When using multiple threads, the convergence behavior can be *highly*
   //! non-deterministic unless deterministic OpenMP reductions are enforced!
-  CPHIS_SCALE_SOLVER_BICGSTAB
+  CPHIS_SCALE_SOLVER_BICGSTAB,
+  //! This solver type provides an interface to external solvers from other
+  //! packages.
+  //! See @link CphisScaleSolverSetExternal @endlink for details.
+  CPHIS_SCALE_SOLVER_EXTERNAL
 } CphisScaleSolverType;
 
 // Forward declaration
@@ -267,6 +271,29 @@ CphisError CphisScaleSolverSetTol(CphisScaleSolver solver, CphisReal tol);
 //! This can be used for over-relaxation and under-relaxation.
 //! The parameter will be ignored by solvers that cannot use it.
 CphisError CphisScaleSolverSetOmega(CphisScaleSolver solver, CphisReal omega);
+//! @brief Set up an external solver.
+//! This function is used to set up a CPHIS interface to an external solver.
+//! The user provides the functions `setupFunc` and `solveFunc`, which are
+//! basically the implementation of @link CphisScaleSolverSetup @endlink
+//! and @link CphisScaleSolverSolve @endlink for the external solver.
+//! When these two CPHIS functions are called, they simply call `setupFunc` and
+//! `solveFunc`, forwarding all arguments and adding the `context` pointer.
+//! The `context` is a user-provided data structure that most likely contains
+//! pointers to the external solver, preconditioner, etc.
+CphisError CphisScaleSolverSetExternal(
+             CphisScaleSolver solver,
+             CphisError (*setupFunc)(CphisScaleSolver, const CphisMat, void*),
+             CphisError (*solveFunc)(
+                          CphisScaleSolver,
+                          const CphisVec,
+                          CphisVec,
+                          CphisConvergenceFlag*,
+                          CphisReal*,
+                          int*,
+                          void*
+                        ),
+             void *context
+           );
 //! @brief Set the matrix and prepare the solver, preconditioner, etc.
 //! @warning This function must not be called twice for the same solver!
 //!          If a new matrix is to be used, please create a new solver.
