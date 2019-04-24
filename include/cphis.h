@@ -173,11 +173,15 @@ struct _CphisMat;
 typedef struct _CphisMat* CphisMat;
 //! @brief Create a matrix.
 //! See @link CphisVecCreate @endlink for details.
+//! @note If a handle is created around an existing matrix (`from != NULL`),
+//!       CPHIS assumes that the existing matrix is finalized or ready to be
+//!       finalized, and @link CphisMatFinalize @endlink will be called.
 CphisError CphisMatCreate(
              CphisMat *mat,
              CphisIndex numElements,
              const CphisIndex *elements,
-             int numLocalDOF,
+             int numLocalDOFRange,
+             int numLocalDOFDomain,
              CphisBackendType type,
              void *from
            );
@@ -185,11 +189,13 @@ CphisError CphisMatCreate(
 CphisError CphisMatDestroy(CphisMat mat);
 //! Get the matrix' number of elements.
 CphisError CphisMatGetNumElements(const CphisMat mat, CphisIndex *numElements);
-//! Get the matrix' number of local degrees of freedom per element.
-CphisError CphisMatGetNumLocalDOF(const CphisMat mat, int *numLocalDOF);
 //! Compute sparse matrix-vector product, i.e., \f$y=Ax\f$.
 CphisError CphisMatVec(const CphisMat A, const CphisVec x, CphisVec y);
-//! Get a pointer to the entries in the given (local) matrix row.
+//! @brief Get the entries in the given (local) matrix row.
+//! Depending on the implementation, this function may copy the matrix entries
+//! to a buffer or it may directly return pointers to the matrix data.
+//! In either case, the user must not modify or deallocate the `cols` and `vals`
+//! arrays.
 CphisError CphisMatGetData(
              const CphisMat mat,
              CphisIndex row,

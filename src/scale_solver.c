@@ -2,6 +2,7 @@
 
 #include <cphis.h>
 #include <scale_solver.h>
+#include <linalg.h>
 #include <stdlib.h>
 
 CphisError CphisScaleSolverCreate(
@@ -77,6 +78,9 @@ CphisError CphisScaleSolverSetOmega(CphisScaleSolver solver, CphisReal omega)
 
 CphisError CphisScaleSolverSetup(CphisScaleSolver solver, const CphisMat A)
 {
+  if (A->numLocalDOFRange != A->numLocalDOFDomain) {
+    CPHISCHECK(CPHIS_INCOMPATIBLE);
+  }
   if (solver->A) {
     CPHISCHECK(CPHIS_INVALID_STATE);
   }

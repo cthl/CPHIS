@@ -11,7 +11,8 @@ CphisError CphisMatCreate(
              CphisMat *mat,
              CphisIndex numElements,
              const CphisIndex *elements,
-             int numLocalDOF,
+             int numLocalDOFRange,
+             int numLocalDOFDomain,
              CphisBackendType type,
              void *from
            )
@@ -24,18 +25,23 @@ CphisError CphisMatCreate(
   (*mat)->type = type;
   (*mat)->numElements = numElements;
   (*mat)->elements = elements;
-  (*mat)->numLocalDOF = numLocalDOF;
+  (*mat)->numLocalDOFRange = numLocalDOFRange;
+  (*mat)->numLocalDOFDomain = numLocalDOFDomain;
   (*mat)->finalized = 0;
   (*mat)->owned = (from == NULL);
+  (*mat)->bufferSize = 0;
+  (*mat)->colBuffer = NULL;
+  (*mat)->valBuffer = NULL;
 
+  CphisError err;
   if (from) {
     (*mat)->mat = from;
+    err = CphisMatFinalize(*mat);
   }
   else {
-    CphisError err;
     switch ((*mat)->type) {
     case CPHIS_BACKEND_DEFAULT:
-      err = CphisMatCreate_default(mat, numElements, numLocalDOF);
+      err = CphisMatCreate_default(mat, numElements, numLocalDOFRange);
       break;
     case CPHIS_BACKEND_TPETRA:
       #ifdef CPHIS_HAVE_TPETRA
@@ -43,7 +49,7 @@ CphisError CphisMatCreate(
               mat,
               numElements,
               elements,
-              numLocalDOF
+              numLocalDOFRange
             );
       #else
       err = CPHIS_MISSING_BACKEND;
@@ -53,10 +59,11 @@ CphisError CphisMatCreate(
       err = CPHIS_UNKNOWN_TYPE;
       break;
     }
-    if (err) {
-      free(*mat);
-      CPHISCHECK(err);
-    }
+  }
+
+  if (err) {
+    free(*mat);
+    CPHISCHECK(err);
   }
 
   return CPHIS_SUCCESS;
@@ -64,7 +71,7 @@ CphisError CphisMatCreate(
 
 CphisError CphisMatDestroy(CphisMat mat)
 {
-  CphisError err;
+  CphisError err = CPHIS_SUCCESS;
 
   if (mat->owned) {
     switch (mat->type) {
@@ -93,12 +100,6 @@ CphisError CphisMatDestroy(CphisMat mat)
 CphisError CphisMatGetNumElements(const CphisMat mat, CphisIndex *numElements)
 {
   *numElements = mat->numElements;
-  return CPHIS_SUCCESS;
-}
-
-CphisError CphisMatGetNumLocalDOF(const CphisMat mat, int *numLocalDOF)
-{
-  *numLocalDOF = mat->numLocalDOF;
   return CPHIS_SUCCESS;
 }
 

@@ -57,7 +57,7 @@ CphisError CphisScaleSolverSetup_CG(CphisScaleSolver solver)
           &data->r,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -66,7 +66,7 @@ CphisError CphisScaleSolverSetup_CG(CphisScaleSolver solver)
           &data->p,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -75,7 +75,7 @@ CphisError CphisScaleSolverSetup_CG(CphisScaleSolver solver)
           &data->z,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -115,7 +115,7 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           &data->r0,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -124,7 +124,7 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           &data->r,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -133,7 +133,7 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           &data->p,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -142,7 +142,7 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           &data->v,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -151,7 +151,7 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           &data->h,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -160,7 +160,7 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           &data->s,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -169,7 +169,7 @@ CphisError CphisScaleSolverSetup_BiCGStab(CphisScaleSolver solver)
           &data->t,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );

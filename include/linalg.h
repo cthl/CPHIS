@@ -83,8 +83,10 @@ struct _CphisMat
   CphisIndex numElements;
   // Array of global element indices owned by this process
   const CphisIndex *elements;
-  // Number of local degrees of freedom per element
-  int numLocalDOF;
+  // Number of local degrees of freedom per element in the range of the matrix.
+  int numLocalDOFRange;
+  // Number of local degrees of freedom per element in the domain of the matrix.
+  int numLocalDOFDomain;
   // Pointer to the actual matrix (see vector class).
   void *mat;
   // A flag to determine whether or not the matrix has been finalized.
@@ -92,6 +94,13 @@ struct _CphisMat
   // Flag indicating if the underlying matrix is owned by this handle, i.e.,
   // if it will be deallocated when the handle is destroyed
   int owned;
+  // Buffers used by `CphisMatGetData`.
+  // If a matrix implementation requires these buffers, they should be allocated
+  // in its implementation of `CphisMatFinalize`, and they should be deallocated
+  // in its implementation of `CphisMatDestroy`.
+  CphisIndex bufferSize;
+  CphisIndex *colBuffer;
+  CphisScalar *valBuffer;
 };
 
 // Internal matrix structure for the default implementation
@@ -112,7 +121,7 @@ struct _CphisMat_default
 CphisError CphisMatCreate_default(
              CphisMat *mat,
              CphisIndex numElements,
-             int numLocalDOF
+             int numLocalDOFRange
            );
 CphisError CphisMatDestroy_default(CphisMat mat);
 CphisError CphisMatVec_default(const CphisMat A, const CphisVec x, CphisVec y);

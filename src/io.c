@@ -175,6 +175,7 @@ CphisError CphisMatFromMatrixMarket(
           numRows/numLocalDOF,
           NULL,
           numLocalDOF,
+          numLocalDOF,
           CPHIS_BACKEND_DEFAULT,
           NULL
         );
@@ -274,8 +275,8 @@ CphisError CphisMatPrint(const CphisMat mat)
   const CphisScalar *vals;
   CphisIndex numEntries;
   for (CphisIndex k = 0; k < mat->numElements; k++) {
-    for (int l = 0; l < mat->numLocalDOF; l++) {
-      const CphisIndex row = k*mat->numLocalDOF + l;
+    for (int l = 0; l < mat->numLocalDOFRange; l++) {
+      const CphisIndex row = k*mat->numLocalDOFRange + l;
       err = CphisMatGetData(
               mat,
               row,
@@ -290,8 +291,8 @@ CphisError CphisMatPrint(const CphisMat mat)
           cols[j],
           k,
           l,
-          cols[j]/mat->numLocalDOF,
-          cols[j]%mat->numLocalDOF,
+          cols[j]/mat->numLocalDOFDomain,
+          cols[j]%mat->numLocalDOFDomain,
           vals[j]
         );
       }

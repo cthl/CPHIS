@@ -35,6 +35,10 @@ CphisError CphisScaleSolverDestroy_BlockJacobi(CphisScaleSolver solver)
 
 CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
 {
+  if (solver->A->numLocalDOFRange != solver->A->numLocalDOFDomain) {
+    CPHISCHECK(CPHIS_INCOMPATIBLE);
+  }
+
   solver->data = malloc(sizeof(struct _CphisScaleSolverData_Jacobi));
   if (!solver->data) {
     CPHISCHECK(CPHIS_FAILED_ALLOC);
@@ -42,7 +46,7 @@ CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
 
   struct _CphisScaleSolverData_Jacobi *data = solver->data;
 
-  const CphisIndex numRows = solver->A->numElements*solver->A->numLocalDOF;
+  const CphisIndex numRows = solver->A->numElements*solver->A->numLocalDOFRange;
   data->invD = malloc(numRows*sizeof(CphisScalar));
   if (!data->invD) {
     free(solver->data);
@@ -54,7 +58,7 @@ CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
           &data->r,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -80,7 +84,7 @@ CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
     const CphisIndex iGlobal = CphisIndexLocalToGlobal(
                                  i,
                                  solver->A->elements,
-                                 solver->A->numLocalDOF
+                                 solver->A->numLocalDOFRange
                                );
     for (CphisIndex j = 0; j < numEntries; j++) {
       if (iGlobal == cols[j]) {
@@ -95,6 +99,10 @@ CphisError CphisScaleSolverSetup_Jacobi(CphisScaleSolver solver)
 
 CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
 {
+  if (solver->A->numLocalDOFRange != solver->A->numLocalDOFDomain) {
+    CPHISCHECK(CPHIS_INCOMPATIBLE);
+  }
+
   solver->data = malloc(sizeof(struct _CphisScaleSolverData_BlockJacobi));
   if (!solver->data) {
     CPHISCHECK(CPHIS_FAILED_ALLOC);
@@ -102,7 +110,7 @@ CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
 
   struct _CphisScaleSolverData_BlockJacobi *data = solver->data;
 
-  const int numLocalDOF = solver->A->numLocalDOF;
+  const int numLocalDOF = solver->A->numLocalDOFRange;
   const int blockSize = numLocalDOF*numLocalDOF;
   const CphisIndex numRows = solver->A->numElements*numLocalDOF;
 
@@ -129,12 +137,12 @@ CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
     const CphisIndex iGlobal = CphisIndexLocalToGlobal(
                                  i,
                                  solver->A->elements,
-                                 solver->A->numLocalDOF
+                                 solver->A->numLocalDOFRange
                                );
-    const CphisIndex blockIndex = iGlobal/numLocalDOF;
+    const CphisIndex blockIndex = i/numLocalDOF;
     // Find block diagonal entries.
     for (CphisIndex j = 0; j < numEntries; j++) {
-      if (blockIndex == cols[j]/numLocalDOF) {
+      if (iGlobal/numLocalDOF == cols[j]/numLocalDOF) {
         // Compute row and column index within block.
         const CphisIndex iBlock = iGlobal%numLocalDOF;
         const CphisIndex jBlock = cols[j]%numLocalDOF;
@@ -154,7 +162,7 @@ CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
           &data->r,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );
@@ -167,7 +175,7 @@ CphisError CphisScaleSolverSetup_BlockJacobi(CphisScaleSolver solver)
           &data->z,
           solver->A->numElements,
           solver->A->elements,
-          solver->A->numLocalDOF,
+          solver->A->numLocalDOFRange,
           solver->A->type,
           NULL
         );

@@ -58,7 +58,7 @@ CphisError CphisVecCreate(
 
 CphisError CphisVecDestroy(CphisVec vec)
 {
-  CphisError err;
+  CphisError err = CPHIS_SUCCESS;
 
   if (vec->owned) {
     switch (vec->type) {

@@ -56,7 +56,7 @@ CphisError CphisScaleSolverDestroy_LU(CphisScaleSolver solver)
 CphisError CphisScaleSolverSetup_LU(CphisScaleSolver solver)
 {
   // Create a dense copy of the system matrix.
-  const CphisIndex numRows = solver->A->numElements*solver->A->numLocalDOF;
+  const CphisIndex numRows = solver->A->numElements*solver->A->numLocalDOFRange;
   solver->data = calloc(numRows*numRows, sizeof(CphisScalar));
   if (!solver->data) {
     CPHISCHECK(CPHIS_FAILED_ALLOC);
@@ -94,7 +94,7 @@ CphisError CphisScaleSolverSolve_LU(
            )
 {
   CphisError err;
-  const CphisIndex numRows = solver->A->numElements*solver->A->numLocalDOF;
+  const CphisIndex numRows = solver->A->numElements*solver->A->numLocalDOFRange;
   const CphisScalar *LU = solver->data;
   CphisScalar *bData;
   CphisScalar *xData;

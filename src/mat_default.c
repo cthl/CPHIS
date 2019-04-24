@@ -8,7 +8,7 @@
 CphisError CphisMatCreate_default(
              CphisMat *mat,
              CphisIndex numElements,
-             int numLocalDOF
+             int numLocalDOFRange
            )
 {
 
@@ -20,7 +20,7 @@ CphisError CphisMatCreate_default(
   struct _CphisMat_default *matInternal = (*mat)->mat;
 
   // Create buffers.
-  const CphisIndex numRows = numElements*numLocalDOF;
+  const CphisIndex numRows = numElements*numLocalDOFRange;
   matInternal->bufferCapacities = malloc(numRows*sizeof(CphisIndex));
   matInternal->bufferSizes = malloc(numRows*sizeof(CphisIndex));
   matInternal->colBuffers = malloc(numRows*sizeof(CphisIndex*));
@@ -58,7 +58,7 @@ CphisError CphisMatDestroy_default(CphisMat mat)
   struct _CphisMat_default *matInternal = mat->mat;
 
   // Clean up buffers if necessary.
-  const CphisIndex numRows = mat->numElements*mat->numLocalDOF;
+  const CphisIndex numRows = mat->numElements*mat->numLocalDOFRange;
   if (matInternal->bufferSizes) {
     for (CphisIndex i = 0; i < numRows; i++) {
       free(matInternal->colBuffers[i]);
@@ -88,7 +88,7 @@ CphisError CphisMatVec_default(const CphisMat A, const CphisVec x, CphisVec y)
   const CphisScalar *xData = x->vec;
   CphisScalar *yData = y->vec;
 
-  const CphisIndex numRows = A->numElements*A->numLocalDOF;
+  const CphisIndex numRows = A->numElements*A->numLocalDOFRange;
   #pragma omp parallel for
   for (CphisIndex i = 0; i < numRows; i++) {
     CphisScalar result = 0.0;
@@ -179,7 +179,7 @@ CphisError CphisMatFinalize_default(CphisMat mat)
 
   // We begin by counting the matrix entries.
   size_t nnz = 0;
-  const CphisIndex numRows = mat->numElements*mat->numLocalDOF;
+  const CphisIndex numRows = mat->numElements*mat->numLocalDOFRange;
   #pragma omp parallel for reduction(+:nnz)
   for (CphisIndex i = 0; i < numRows; i++) {
     nnz += matInternal->bufferSizes[i];

@@ -113,6 +113,7 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFScale,
+            numLocalDOFScale,
             type,
             NULL
           );
@@ -154,6 +155,7 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFResidual,
+            numLocalDOFScaleToResidual,
             type,
             NULL
           );
@@ -208,6 +210,7 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             numElements,
             elements,
             numLocalDOFScale,
+            minLocalDOFScale,
             type,
             NULL
           );
@@ -218,8 +221,6 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
   }
 
   // Extract the matrix blocks.
-  int numErrors = 0;
-  #pragma omp parallel for reduction(+:numErrors)
   for (CphisIndex i = 0; i < numRows; i++) {
     const int rowLocalDOF = i%numLocalDOF;
     if (rowLocalDOF > maxLocalDOFScale) {
@@ -239,8 +240,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
             &numEntries
           );
     if (err) {
-      numErrors++;
-      CPHISCHECKTHREAD(err);
+      CphisSolverCleanupScale(solver, scale);
+      CPHISCHECK(err);
     }
 
     // Check if the row belongs to the current scale and/or to lower scales.
@@ -273,8 +274,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
                 vals[j]
               );
         if (err) {
-          numErrors++;
-          CPHISCHECKTHREAD(err);
+          CphisSolverCleanupScale(solver, scale);
+          CPHISCHECK(err);
         }
       }
       if (isRowInResidual && (!isErrorCorrectionScale || isColInScale)) {
@@ -290,8 +291,8 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
                 vals[j]
               );
         if (err) {
-          numErrors++;
-          CPHISCHECKTHREAD(err);
+          CphisSolverCleanupScale(solver, scale);
+          CPHISCHECK(err);
         }
       }
       if (isRowInScale && !isColInScale) {
@@ -307,15 +308,11 @@ static CphisError CphisSolverSetupScale(CphisSolver solver, int scale)
                 vals[j]
               );
         if (err) {
-          numErrors++;
-          CPHISCHECKTHREAD(err);
+          CphisSolverCleanupScale(solver, scale);
+          CPHISCHECK(err);
         }
       }
     }
-  }
-  if (numErrors > 0) {
-    CphisSolverCleanupScale(solver, scale);
-    CPHISCHECK(CPHIS_ERROR_IN_THREAD);
   }
 
   // Finalize matrices.
@@ -387,7 +384,7 @@ CphisError CphisSolverCreate(
           &(*solver)->rfull,
           A->numElements,
           A->elements,
-          A->numLocalDOF,
+          A->numLocalDOFRange,
           A->type,
           NULL
         );CPHISCHECK(err);
