@@ -20,7 +20,9 @@ inline CphisIndex CphisIndexLocalToGlobal(
                     int numLocalDOF
                   )
 {
-  return numLocalDOF*elements[localIndex/numLocalDOF] + localIndex%numLocalDOF;
+  return elements ?
+         numLocalDOF*elements[localIndex/numLocalDOF] + localIndex%numLocalDOF
+         : localIndex;
 }
 
 #endif // __AUX_H__
