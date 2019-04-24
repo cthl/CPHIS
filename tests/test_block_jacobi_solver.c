@@ -20,6 +20,7 @@ int main()
           n2,
           NULL,
           m,
+          m,
           CPHIS_BACKEND_DEFAULT,
           NULL
         );CPHISCHECK(err);
