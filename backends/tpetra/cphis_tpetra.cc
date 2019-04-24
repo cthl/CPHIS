@@ -60,7 +60,7 @@ static CphisError createTpetraMap(
     = Teuchos::rcp(new Teuchos::MpiComm<int>(MPI_COMM_WORLD));
   map = Teuchos::rcp(
           new TpetraMap(
-                numGlobalElements,
+                numGlobalElements*numLocalDOF,
                 indices.view(0, numElements*numLocalDOF),
                 0,
                 comm
@@ -231,7 +231,7 @@ CphisError CphisMatCreate_Tpetra(
              CphisMat *mat,
              CphisIndex numElements,
              const CphisIndex *elements,
-             int numLocalDOF
+             int numLocalDOFRange
            )
 {
   try {
@@ -240,7 +240,7 @@ CphisError CphisMatCreate_Tpetra(
     err = createTpetraMap(
             numElements,
             elements,
-            numLocalDOF,
+            numLocalDOFRange,
             map
           );CPHISCHECK(err);
     (*mat)->mat = (void*) new TpetraMat(map, 0);
@@ -255,6 +255,9 @@ CphisError CphisMatCreate_Tpetra(
 CphisError CphisMatDestroy_Tpetra(CphisMat mat)
 {
   delete (TpetraMat*) mat->mat;
+
+  delete[] mat->colBuffer;
+  delete[] mat->valBuffer;
 
   return CPHIS_SUCCESS;
 }
@@ -285,20 +288,38 @@ CphisError CphisMatGetData_Tpetra(
 {
   const TpetraMat *matMat = (TpetraMat*) mat->mat;
 
+  const CphisIndex rowGlobal = CphisIndexLocalToGlobal(
+                                 row,
+                                 mat->elements,
+                                 mat->numLocalDOFRange
+                               );
+
+  size_t numEntriesTpetra;
+
   try {
-    const int err = matMat->getLocalRowViewRaw(
-                              row,
-                              *numEntries,
-                              *cols,
-                              *vals
-                            );
-    if (err) {
-      CPHISCHECK(CPHIS_TPETRA_ERROR);
-    }
+    // We assume that the Tpetra matrix is finalized and thus "locally indexed,"
+    // and we must cannot get an array of global column indices directly.
+    // Hence, we must call the more expensive `getGlobalRowCopy` method.
+    matMat->getGlobalRowCopy(
+      rowGlobal,
+      Teuchos::ArrayView<CphisIndex>(
+        mat->colBuffer,
+        mat->bufferSize
+      ),
+      Teuchos::ArrayView<CphisScalar>(
+        mat->valBuffer,
+        mat->bufferSize
+      ),
+      numEntriesTpetra
+    );
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
   }
+
+  *cols = mat->colBuffer;
+  *vals = mat->valBuffer;
+  *numEntries = (CphisIndex) numEntriesTpetra;
 
   return CPHIS_SUCCESS;
 }
@@ -317,7 +338,7 @@ CphisError CphisMatSet_Tpetra(
   const CphisIndex iGlobal = CphisIndexLocalToGlobal(
                                i,
                                mat->elements,
-                               mat->numLocalDOF
+                               mat->numLocalDOFRange
                              );
 
   try {
@@ -334,11 +355,36 @@ CphisError CphisMatFinalize_Tpetra(CphisMat mat)
 {
   TpetraMat *matMat = (TpetraMat*) mat->mat;
 
+  size_t maxNNZ;
+
   try {
-    matMat->fillComplete();
+    if (!matMat->isFillComplete()) {
+      CphisError err;
+      Teuchos::RCP<const TpetraMap> domainMap;
+      err = createTpetraMap(
+              mat->numElements,
+              mat->elements,
+              mat->numLocalDOFDomain,
+              domainMap
+            );CPHISCHECK(err);
+      matMat->fillComplete(domainMap, matMat->getRowMap());
+    }
+    maxNNZ = matMat->getNodeMaxNumRowEntries();
   }
   catch (...) {
     CPHISCHECK(CPHIS_TPETRA_ERROR);
+  }
+
+  // Create buffers for `CphisMatGetData`.
+  if (mat->bufferSize == 0) {
+    try {
+      mat->colBuffer = new CphisIndex[maxNNZ];
+      mat->valBuffer = new CphisScalar[maxNNZ];
+    }
+    catch (...) {
+      CPHISCHECK(CPHIS_FAILED_ALLOC);
+    }
+    mat->bufferSize = maxNNZ;
   }
 
   return CPHIS_SUCCESS;

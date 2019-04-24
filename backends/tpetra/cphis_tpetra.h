@@ -40,7 +40,7 @@ CphisError CphisMatCreate_Tpetra(
              CphisMat *mat,
              CphisIndex numElements,
              const CphisIndex *elements,
-             int numLocalDOF
+             int numLocalDOFRange
            );
 CphisError CphisMatDestroy_Tpetra(CphisMat mat);
 CphisError CphisMatVec_Tpetra(const CphisMat A, const CphisVec x, CphisVec y);
