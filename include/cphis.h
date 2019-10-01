@@ -159,6 +159,9 @@ CphisError CphisVecSetAll(CphisVec vec, CphisScalar val);
 CphisError CphisVecAssign(const CphisVec x, CphisVec y);
 //! Get a pointer to the array of vector entries.
 CphisError CphisVecGetData(const CphisVec vec, CphisScalar **data);
+//! @brief Get a pointer to the internal vector object.
+//! The type of the returned object depends on the backend that is used.
+CphisError CphisVecGetInternal(const CphisVec vec, void **vecInternal);
 //! @brief Load a vector from a matrix market file.
 //! The vector will use the default linear algebra backend.
 CphisError CphisVecFromMatrixMarket(
@@ -203,6 +206,9 @@ CphisError CphisMatGetData(
              const CphisScalar **vals,
              CphisIndex *numEntries
            );
+//! @brief Get a pointer to the internal matrix object.
+//! The type of the returned object depends on the backend that is used.
+CphisError CphisMatGetInternal(const CphisMat mat, void **matInternal);
 //! @brief Set (or add) a matrix entry.
 //! @param i Row index. If the matrix is distributed,
 //!          this is the local row index.
@@ -274,7 +280,7 @@ CphisError CphisScaleSolverDestroy(CphisScaleSolver solver);
 //! This has no effect for direct solvers.
 CphisError CphisScaleSolverSetMaxIter(CphisScaleSolver solver, int maxIter);
 //! @brief Set the relative solver tolerance.
-//! See @link CphisConfSetTol @endlink for the definition of the tolerances.
+//! See @link CphisConfSetTolRel @endlink for the definition of the tolerances.
 //! @note This may be set to `0.0` if no convergence test is desired, e.g.,
 //!       for smoothers.
 CphisError CphisScaleSolverSetTol(CphisScaleSolver solver, CphisReal tol);
@@ -293,9 +299,8 @@ CphisError CphisScaleSolverSetOmega(CphisScaleSolver solver, CphisReal omega);
 //! pointers to the external solver, preconditioner, etc.
 CphisError CphisScaleSolverSetExternal(
              CphisScaleSolver solver,
-             CphisError (*setupFunc)(CphisScaleSolver, const CphisMat, void*),
+             CphisError (*setupFunc)(const CphisMat, void*),
              CphisError (*solveFunc)(
-                          CphisScaleSolver,
                           const CphisVec,
                           CphisVec,
                           CphisConvergenceFlag*,
@@ -376,7 +381,9 @@ CphisError CphisConfCreate(
 CphisError CphisConfDestroy(CphisConf conf);
 //! @brief Set relative solver tolerance.
 //! CPHIS will stop once \f$\|b-Ax_k\|_2/\|b-Ax_0\|_2<\text{tol}\f$.
-CphisError CphisConfSetTol(CphisConf conf, CphisReal tol);
+CphisError CphisConfSetTolRel(CphisConf conf, CphisReal tol);
+//! @brief Set absolute solver tolerance.
+CphisError CphisConfSetTolAbs(CphisConf conf, CphisReal tol);
 //! @brief Set the maximum number of iterations (cycles).
 //! This can be used to stop early in case of slow convergence, or to limit the
 //! number of cycles when CPHIS is used as a preconditioner.
@@ -433,6 +440,14 @@ CphisError CphisSolverCreate(
            );
 //! Destroy a CPHIS solver.
 CphisError CphisSolverDestroy(CphisSolver solver);
+//! @brief Set relative tolerance.
+//! Use this function to overwrite the tolerance in the configuration that was
+//! used to create the solver.
+CphisError CphisSolverSetTolRel(CphisSolver solver, CphisReal tol);
+//! @brief Set absolute tolerance.
+//! Use this function to overwrite the tolerance in the configuration that was
+//! used to create the solver.
+CphisError CphisSolverSetTolAbs(CphisSolver solver, CphisReal tol);
 //! Solve a linear system.
 //! @param b Right-hand side of the system
 //! @param x Solution vector. It will also be used as the initial guess.

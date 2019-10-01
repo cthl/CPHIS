@@ -173,6 +173,12 @@ CphisError CphisMatGetData(
   return CPHIS_SUCCESS;
 }
 
+CphisError CphisMatGetInternal(const CphisMat mat, void **matInternal)
+{
+  *matInternal = mat->mat;
+  return CPHIS_SUCCESS;
+}
+
 CphisError CphisMatSet(
              CphisMat mat,
              CphisIndex i,

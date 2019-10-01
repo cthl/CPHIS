@@ -284,3 +284,9 @@ CphisError CphisVecGetData(const CphisVec vec, CphisScalar **data)
 
   return CPHIS_SUCCESS;
 }
+
+CphisError CphisVecGetInternal(const CphisVec vec, void **vecInternal)
+{
+  *vecInternal = vec->vec;
+  return CPHIS_SUCCESS;
+}

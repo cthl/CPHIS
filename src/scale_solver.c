@@ -199,9 +199,8 @@ CphisError CphisScaleSolverSolve(
 
 CphisError CphisScaleSolverSetExternal(
              CphisScaleSolver solver,
-             CphisError (*setupFunc)(CphisScaleSolver, const CphisMat, void*),
+             CphisError (*setupFunc)(const CphisMat, void*),
              CphisError (*solveFunc)(
-                          CphisScaleSolver,
                           const CphisVec,
                           CphisVec,
                           CphisConvergenceFlag*,
@@ -243,7 +242,7 @@ CphisError CphisScaleSolverSetup_External(CphisScaleSolver solver)
 
   struct _CphisScaleSolverData_External *data = solver->data;
 
-  err = data->setupFunc(solver, solver->A, data->context);
+  err = data->setupFunc(solver->A, data->context);
 
   return err;
 }
@@ -261,7 +260,7 @@ CphisError CphisScaleSolverSolve_External(
 
   struct _CphisScaleSolverData_External *data = solver->data;
 
-  err = data->solveFunc(solver, b, x, flag, residual, iter, data->context);
+  err = data->solveFunc(b, x, flag, residual, iter, data->context);
 
   return err;
 }

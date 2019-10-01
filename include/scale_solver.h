@@ -112,10 +112,9 @@ CphisError CphisScaleSolverSolve_BiCGStab(
 struct _CphisScaleSolverData_External
 {
   // Pointer to solver setup function
-  CphisError (*setupFunc)(CphisScaleSolver, const CphisMat, void*);
+  CphisError (*setupFunc)(const CphisMat, void*);
   // Pointer to a function that calls the external solver
   CphisError (*solveFunc)(
-               CphisScaleSolver,
                const CphisVec,
                CphisVec,
                CphisConvergenceFlag*,

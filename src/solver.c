@@ -461,6 +461,18 @@ CphisError CphisSolverDestroy(CphisSolver solver)
   return CPHIS_SUCCESS;
 }
 
+CphisError CphisSolverSetTolRel(CphisSolver solver, CphisReal tol)
+{
+  solver->conf->rtol = tol;
+  return CPHIS_SUCCESS;
+}
+
+CphisError CphisSolverSetTolAbs(CphisSolver solver, CphisReal tol)
+{
+  solver->conf->atol = tol;
+  return CPHIS_SUCCESS;
+}
+
 static CphisError CphisSolverSolveCoarseScale(
                     const CphisSolver solver,
                     const CphisVec f,
@@ -1087,7 +1099,8 @@ CphisError CphisSolverSolve(
   #endif
 
   // Compute initial residual norm (only if used as a stopping criterion).
-  const int computeResidual = solver->conf->tol > 0.0;
+  const int computeResidual = solver->conf->rtol > 0.0
+                           || solver->conf->atol > 0.0;
   if (computeResidual) {
     err = CphisMatVec(solver->A, x, solver->rfull);CPHISCHECK(err);
     err = CphisVecAXPY(-1.0, b, solver->rfull);CPHISCHECK(err);
@@ -1106,8 +1119,14 @@ CphisError CphisSolverSolve(
   }
 
   while (1) {
-    // Check residual norm.
-    if (solver->conf->tol > 0.0 && rNorm/r0Norm < solver->conf->tol) {
+    // Check relative residual norm.
+    if (solver->conf->rtol > 0.0 && rNorm/r0Norm < solver->conf->rtol) {
+      if (flag) *flag = CPHIS_CONVERGED;
+      break;
+    }
+
+    // Check absolute residual norm.
+    if (solver->conf->atol > 0.0 && rNorm < solver->conf->atol) {
       if (flag) *flag = CPHIS_CONVERGED;
       break;
     }
@@ -1166,10 +1185,16 @@ CphisError CphisSolverSolve(
       CphisPrintHline(1);
   }
   if (solver->conf->verbosity >= CPHIS_VERBOSITY_SUMMARY) {
-    if (computeResidual && rNorm/r0Norm < solver->conf->tol) {
+    if (computeResidual && rNorm/r0Norm < solver->conf->rtol) {
       CphisPrintf(
-        "CPHIS: Solver converged to desired tolerance of %.3e!\n",
-        solver->conf->tol
+        "CPHIS: Solver converged to desired rel. tolerance of %.3e!\n",
+        solver->conf->rtol
+      );
+    }
+    if (computeResidual && rNorm < solver->conf->atol) {
+      CphisPrintf(
+        "CPHIS: Solver converged to desired abs. tolerance of %.3e!\n",
+        solver->conf->atol
       );
     }
     if (k >= solver->conf->maxIter) {

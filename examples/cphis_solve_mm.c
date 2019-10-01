@@ -65,7 +65,7 @@ int main(int argc, char **argv)
   CphisConf conf;
   CphisSolver solver;
   err = CphisConfCreate(&conf, numLocalDOF, numScales, scales);CPHISCHECK(err);
-  err = CphisConfSetTol(conf, tol);CPHISCHECK(err);
+  err = CphisConfSetTolRel(conf, tol);CPHISCHECK(err);
   err = CphisConfSetMaxIter(conf, maxIter);CPHISCHECK(err);
   err = CphisConfSetNu(conf, nu1, nu2);CPHISCHECK(err);
   err = CphisConfSetSmoothers(

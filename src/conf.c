@@ -64,7 +64,8 @@ CphisError CphisConfCreate(
   }
 
   // Set default parameters.
-  (*conf)->tol = 1.0e-6;
+  (*conf)->rtol = 1.0e-6;
+  (*conf)->atol = 0.0;
   (*conf)->maxIter = 1e6;
   (*conf)->nu1 = 1;
   (*conf)->nu2 = 0;
@@ -91,9 +92,15 @@ CphisError CphisConfDestroy(CphisConf conf)
   return CPHIS_SUCCESS;
 }
 
-CphisError CphisConfSetTol(CphisConf conf, CphisReal tol)
+CphisError CphisConfSetTolRel(CphisConf conf, CphisReal tol)
 {
-  conf->tol = tol;
+  conf->rtol = tol;
+  return CPHIS_SUCCESS;
+}
+
+CphisError CphisConfSetTolAbs(CphisConf conf, CphisReal tol)
+{
+  conf->atol = tol;
   return CPHIS_SUCCESS;
 }
 
@@ -114,10 +121,12 @@ CphisError CphisConfSetCycleType(CphisConf conf, CphisCycleType cycle)
 
 CphisError CphisConfSetFMGCycle(CphisConf conf, int fmgCycle)
 {
-  // FMG has not been implemented, so we don't allow the user to select it.
-  CPHISCHECK(CPHIS_NOT_IMPLEMENTED);
+  // FMG has not been implemented, so we don't allow the user to enable it.
+  if (fmgCycle) {
+    CPHISCHECK(CPHIS_NOT_IMPLEMENTED);
+  }
   //conf->fmgCycle = fmgCycle;
-  //return CPHIS_SUCCESS;
+  return CPHIS_SUCCESS;
 }
 
 CphisError CphisConfSetVerbosity(CphisConf conf, CphisVerbosityLevel verbosity)

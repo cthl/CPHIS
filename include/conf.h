@@ -22,7 +22,9 @@ struct _CphisConf
   // the user's responsibility.
   int *solversOwned;
   // Relative tolerance
-  CphisReal tol;
+  CphisReal rtol;
+  // Absolute tolerance
+  CphisReal atol;
   // Number of times the scale solver is called before cycling (nu1) and after
   // cycling (nu2). These parameters are ignored for direct, i.e.,
   // non-iterative scale solvers.
