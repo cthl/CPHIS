@@ -1112,7 +1112,7 @@ CphisError CphisSolverSolve(
   solver->timers[CPHIS_TIMER_SYSTEM_RESIDUAL] += omp_get_wtime() - tStart;
   #endif
 
-  if (solver->conf->verbosity >= CPHIS_VERBOSITY_DETAILED) {
+  if (solver->conf->verbosity >= CPHIS_VERBOSITY_SUMMARY) {
     CphisPrintHline(1);
     CphisPrintf("CPHIS: Beginning solve\n");
     CphisPrintHline(1);
@@ -1181,7 +1181,7 @@ CphisError CphisSolverSolve(
   solver->timers[CPHIS_TIMER_SOLVER] += tEnd - tStart;
   #endif
 
-  if (solver->conf->verbosity >= CPHIS_VERBOSITY_DETAILED) {
+  if (solver->conf->verbosity >= CPHIS_VERBOSITY_SUMMARY) {
       CphisPrintHline(1);
   }
   if (solver->conf->verbosity >= CPHIS_VERBOSITY_SUMMARY) {
@@ -1223,7 +1223,7 @@ CphisError CphisSolverSolve(
 
     err = CphisSolverPrintTimers(solver);CPHISCHECK(err);
   }
-  if (solver->conf->verbosity >= CPHIS_VERBOSITY_DETAILED) {
+  if (solver->conf->verbosity >= CPHIS_VERBOSITY_SUMMARY) {
       CphisPrintHline(1);
   }
 
