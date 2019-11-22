@@ -1098,6 +1098,9 @@ CphisError CphisSolverSolve(
   const double tStart = omp_get_wtime();
   #endif
 
+  // Reset number of coarse scale solver iterations.
+  solver->iterCoarseScale = 0;
+
   // Compute initial residual norm (only if used as a stopping criterion).
   const int computeResidual = solver->conf->rtol > 0.0
                            || solver->conf->atol > 0.0;
