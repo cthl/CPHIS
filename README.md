@@ -1,3 +1,5 @@
+![CPHIS icon](cphis.png)
+
 # CHPIS
 ## Composable p-hierarchical solver
 
