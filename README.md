@@ -18,3 +18,5 @@ and software installations.
 Besides its stand-alone OpenMP-based linear algebra backend, CPHIS currently
 supports the Tpetra package of the Trilinos project for hybrid parallel
 linear algebra.
+CPHIS' modular design allows for the easy integration of other linear algebra
+and solver packages, such as PETSc, MueLu, or AMGX, with little coding effort.
