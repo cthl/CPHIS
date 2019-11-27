@@ -6,8 +6,8 @@
 CPHIS is a composable implementation of p-multigrid methods for the
 solution of linear systems in discontinuous Galerkin discretizations with
 hierarchical basis functions.
-It is composable in the sense that CPHIS can not only be used within other
-scientific software, but also that third-party linear algebra and solver
+It is composable in the sense that CPHIS can be used within other
+scientific software, and third-party linear algebra and solver
 packages can be used within CPHIS.
 
 CPHIS itself is entirely written in C99 and has no further dependencies,
