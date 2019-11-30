@@ -52,7 +52,7 @@ int main(int argc, char **argv)
         );CPHISCHECK(err);
   err = CphisVecSetAll(x, 0.0);CPHISCHECK(err);
 
-  // Create solver and solve linear system.
+  // Create the coarse scale solver.
   CphisScaleSolver coarseScaleSolver;
   err = CphisScaleSolverCreate(
           &coarseScaleSolver,

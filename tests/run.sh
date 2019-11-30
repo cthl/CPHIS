@@ -4,7 +4,7 @@ FAILED=0
 
 for f in *.x; do
   echo "Running test $f"
-  ./$f
+  OMP_NUM_THREADS=1 ./$f
   if [ $? -ne 0 ]; then
     FAILED=$((FAILED + 1))
     echo "-> failed"

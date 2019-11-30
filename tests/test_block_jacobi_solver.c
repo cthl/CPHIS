@@ -1,62 +1,46 @@
 #include <cphis.h>
-#include "test_poisson2d.h"
 #include <stdlib.h>
 
 int main()
 {
   CphisError err;
 
+  // The desired tolerance and the expected results
   const CphisReal tol = 1.0e-3;
-    // Block size for the test
-  const int m = 4;
+  const CphisReal refResidual = tol;
+  const int refIter = 10846;
 
   // Get linear system for the test.
-  const CphisIndex n = 50;
-  const CphisIndex n2 = n*n;
+  const CphisIndex n = 640;
+  const int numLocalDOF = 10;
   CphisMat A;
-  CphisVec u, ux, f, r;
-  err = CphisMatCreate(
+  CphisVec u, f, r;
+  err = CphisMatFromMatrixMarket(
           &A,
-          n2,
-          NULL,
-          m,
-          m,
-          CPHIS_BACKEND_DEFAULT,
-          NULL
+          numLocalDOF,
+          "../Atest.mtx"
+        );CPHISCHECK(err);
+  err = CphisVecFromMatrixMarket(
+          &f,
+          numLocalDOF,
+          "../ftest.mtx"
         );CPHISCHECK(err);
   err = CphisVecCreate(
           &u,
-          n2,
+          n,
           NULL,
-          m,
-          CPHIS_BACKEND_DEFAULT,
-          NULL
-        );CPHISCHECK(err);
-  err = CphisVecCreate(
-          &ux,
-          n2,
-          NULL,
-          m,
-          CPHIS_BACKEND_DEFAULT,
-          NULL
-        );CPHISCHECK(err);
-  err = CphisVecCreate(
-          &f,
-          n2,
-          NULL,
-          m,
+          numLocalDOF,
           CPHIS_BACKEND_DEFAULT,
           NULL
         );CPHISCHECK(err);
   err = CphisVecCreate(
           &r,
-          n2,
+          n,
           NULL,
-          m,
+          numLocalDOF,
           CPHIS_BACKEND_DEFAULT,
           NULL
         );CPHISCHECK(err);
-  err = getPoisson2dSystem(2*n, A, f, u, ux);
 
   // Compute initial residual norm.
   CphisScalar r0Norm;
@@ -70,34 +54,36 @@ int main()
           &solver,
           CPHIS_SCALE_SOLVER_BLOCK_JACOBI
         );CPHISCHECK(err);
-  err = CphisScaleSolverSetTol(solver, tol);
+  err = CphisScaleSolverSetTol(solver, tol);CPHISCHECK(err);
   err = CphisScaleSolverSetup(solver, A);CPHISCHECK(err);
+
   CphisConvergenceFlag flag;
-  err = CphisScaleSolverSolve(solver, f, u, &flag, NULL, NULL);CPHISCHECK(err);
+  int iter;
+  err = CphisScaleSolverSolve(solver, f, u, &flag, NULL, &iter);CPHISCHECK(err);
+
+  // Check convergence flag.
   if (flag != CPHIS_CONVERGED) {
-    return CPHIS_TEST_FAILED;
+    CPHISCHECK(CPHIS_TEST_FAILED);
   }
 
-  // Check error and residual norm.
-  CphisReal eNorm, uxNorm, rNorm;
-  err = CphisVecNorm2(ux, &uxNorm);CPHISCHECK(err);
-  err = CphisVecAXPY(-1.0, u, ux);CPHISCHECK(err);
-  err = CphisVecNorm2(ux, &eNorm);CPHISCHECK(err);
-  if (eNorm/uxNorm > 3.0e-1) {
-    return CPHIS_TEST_FAILED;
+  // Check number of iterations.
+  if (iter != refIter) {
+    CPHISCHECK(CPHIS_TEST_FAILED);
   }
+
+  // Explicit residual check
+  CphisReal rNorm;
   err = CphisMatVec(A, u, r);CPHISCHECK(err);
   err = CphisVecAXPY(-1.0, f, r);CPHISCHECK(err);
   err = CphisVecNorm2(r, &rNorm);CPHISCHECK(err);
-  if (rNorm/r0Norm > tol) {
-    return CPHIS_TEST_FAILED;
+  if (rNorm/r0Norm > refResidual) {
+    CPHISCHECK(CPHIS_TEST_FAILED);
   }
 
   // Clean up.
   err = CphisScaleSolverDestroy(solver);CPHISCHECK(err);
   err = CphisMatDestroy(A);CPHISCHECK(err);
   err = CphisVecDestroy(u);CPHISCHECK(err);
-  err = CphisVecDestroy(ux);CPHISCHECK(err);
   err = CphisVecDestroy(f);CPHISCHECK(err);
   err = CphisVecDestroy(r);CPHISCHECK(err);
 

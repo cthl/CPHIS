@@ -34,7 +34,7 @@ int main()
 
   // Check tolerance.
   if (rnorm/bnorm > 1.0e-15) {
-    return CPHIS_TEST_FAILED;
+    CPHISCHECK(CPHIS_TEST_FAILED);
   }
   return CPHIS_SUCCESS;
 }
