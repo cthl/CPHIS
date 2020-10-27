@@ -7,8 +7,6 @@ int main()
 
   // The desired tolerance and the expected results
   const CphisReal tol = 1.0e-8;
-  const CphisReal refResidual = 9.352e-9;
-  const int refIter = 124;
 
   // Get linear system for the test.
   const CphisIndex n = 640;
@@ -23,7 +21,7 @@ int main()
   err = CphisVecFromMatrixMarket(
           &f,
           numLocalDOF,
-          "../ftest.mtx"
+          "../btest.mtx"
         );CPHISCHECK(err);
   err = CphisVecCreate(
           &u,
@@ -65,7 +63,8 @@ int main()
   err = CphisConfSetNu(conf, 4, 4);CPHISCHECK(err);
   err = CphisConfSetSmoothers(
           conf,
-          CPHIS_SCALE_SOLVER_BLOCK_JACOBI
+          CPHIS_SCALE_SOLVER_BLOCK_JACOBI,
+	  1.0
         );CPHISCHECK(err);
   err = CphisConfSetScaleSolver(conf, 0, coarseScaleSolver);CPHISCHECK(err);
   err = CphisSolverCreate(&solver, conf, A);CPHISCHECK(err);
@@ -79,17 +78,12 @@ int main()
     CPHISCHECK(CPHIS_TEST_FAILED);
   }
 
-  // Check number of iterations.
-  if (iter != refIter) {
-    CPHISCHECK(CPHIS_TEST_FAILED);
-  }
-
   // Explicit residual check
   CphisReal rNorm;
   err = CphisMatVec(A, u, r);CPHISCHECK(err);
   err = CphisVecAXPY(-1.0, f, r);CPHISCHECK(err);
   err = CphisVecNorm2(r, &rNorm);CPHISCHECK(err);
-  if (rNorm/r0Norm > refResidual) {
+  if (rNorm/r0Norm > tol) {
     CPHISCHECK(CPHIS_TEST_FAILED);
   }
 

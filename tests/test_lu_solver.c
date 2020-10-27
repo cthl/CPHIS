@@ -6,7 +6,7 @@ int main()
   CphisError err;
 
   // The desired tolerance and the expected results
-  const CphisReal refResidual = 1.700e-12;
+  const CphisReal tol = 2.0e-12;
 
   // Get linear system for the test.
   const CphisIndex n = 640;
@@ -14,7 +14,7 @@ int main()
   CphisMat A;
   CphisVec u, f, r;
   err = CphisMatFromMatrixMarket(&A, num_loc, "../Atest.mtx");CPHISCHECK(err);
-  err = CphisVecFromMatrixMarket(&f, num_loc, "../ftest.mtx");CPHISCHECK(err);
+  err = CphisVecFromMatrixMarket(&f, num_loc, "../btest.mtx");CPHISCHECK(err);
   err = CphisVecCreate(
           &u,
           n,
@@ -60,7 +60,7 @@ int main()
   err = CphisMatVec(A, u, r);CPHISCHECK(err);
   err = CphisVecAXPY(-1.0, f, r);CPHISCHECK(err);
   err = CphisVecNorm2(r, &rNorm);CPHISCHECK(err);
-  if (rNorm/r0Norm > refResidual) {
+  if (rNorm/r0Norm > tol) {
     CPHISCHECK(CPHIS_TEST_FAILED);
   }
 

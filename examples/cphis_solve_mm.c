@@ -70,7 +70,8 @@ int main(int argc, char **argv)
   err = CphisConfSetNu(conf, nu1, nu2);CPHISCHECK(err);
   err = CphisConfSetSmoothers(
           conf,
-          CPHIS_SCALE_SOLVER_BLOCK_JACOBI
+          CPHIS_SCALE_SOLVER_BLOCK_JACOBI,
+	  1.0
         );CPHISCHECK(err);
   err = CphisConfSetScaleSolver(conf, 0, coarseScaleSolver);CPHISCHECK(err);
   err = CphisSolverCreate(&solver, conf, A);CPHISCHECK(err);

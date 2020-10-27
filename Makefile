@@ -1,5 +1,5 @@
-CC=icc
-CFLAGS=-pedantic -Wall -Wextra -Iinclude -std=c99 -O3 -g -fopenmp
+CC=mpicc
+CFLAGS=-Wall -Wextra -Iinclude -std=c99 -O3 -g -fopenmp
 LDFLAGS=-L. -lm -lcphis -fopenmp
 
 # Uncomment to enable the Tpetra (Trilinos) linear algebra backend.
@@ -23,10 +23,10 @@ src/%.o: src/%.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 tests/%.x: tests/%.c
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS) -lm
 
 examples/%.x: examples/%.c
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS) -lm
 
 doc: doxygen.conf
 	doxygen doxygen.conf
