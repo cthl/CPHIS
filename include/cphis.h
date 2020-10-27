@@ -420,7 +420,11 @@ CphisError CphisConfSetScaleSolver(
 //! This function creates a smoother of the desired type for each scale and
 //! then sets it. This is more convenient than creating and setting smoothers
 //! manually for each scale.
-CphisError CphisConfSetSmoothers(CphisConf conf, CphisScaleSolverType type);
+CphisError CphisConfSetSmoothers(
+             CphisConf conf,
+             CphisScaleSolverType type,
+             CphisReal omega
+           );
 
 // Forward declaration
 struct _CphisSolver;

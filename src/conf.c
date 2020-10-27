@@ -164,23 +164,36 @@ CphisError CphisConfSetScaleSolver(
   return CPHIS_SUCCESS;
 }
 
-CphisError CphisConfSetSmoothers(CphisConf conf, CphisScaleSolverType type)
+CphisError CphisConfSetSmoothers(
+             CphisConf conf,
+             CphisScaleSolverType type,
+             CphisReal omega
+           )
 {
   CphisError err;
 
   // Create and set smoother for all scales except the coarsest one.
-  for (int s = conf->numScales - 1; s > 0; s--) {
+  int s;
+  for (s = conf->numScales - 1; s > 0; s--) {
     err = CphisScaleSolverCreate(&conf->solvers[s], type);
     if (err) {
-      // Clean up and abort.
-      for (s++; s < conf->numScales; s++) {
-        CphisScaleSolverDestroy(conf->solvers[s]);
-      }
-      CPHISCHECK(err);
+      // Clean up solvers that have already been created.
+      s++;
+      goto cphis_conf_set_smoothers_cleanup;
     }
+    err = CphisScaleSolverSetOmega(conf->solvers[s], omega);
+    if (err) goto cphis_conf_set_smoothers_cleanup;
     // Since we created the solver, we need to make sure we destroy it later on.
     conf->solversOwned[s] = 1;
   }
 
   return CPHIS_SUCCESS;
+
+cphis_conf_set_smoothers_cleanup:
+  // Clean up and abort.
+  for (; s < conf->numScales; s++) {
+    CphisScaleSolverDestroy(conf->solvers[s]);
+  }
+  CPHISCHECK(err);
+  return err; // Suppress compiler warning (missing return statement).
 }
